@@ -7,12 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
-    <Compile Remove="*Test.cs" />
+    <Compile Remove="Test/*" />
   </ItemGroup>
 
-
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-  </PropertyGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
     <PackageReference Include="NUnit.ConsoleRunner" Version="3.16.3" />
     <PackageReference Include="NUnit" Version="3.13.3" />

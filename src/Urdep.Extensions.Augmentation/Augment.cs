@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Urdep.Extensions.Augment
+namespace Urdep.Extensions.Augmentation
 {
     public static class Augment
     {
@@ -15,7 +15,7 @@ namespace Urdep.Extensions.Augment
         public static AugmentedStruct<T> S<T>(T thing)
             where T : struct => new AugmentedStruct<T>(thing);
 
-        public static AugmentedNullableStruct<T> N<T>(Nullable<T> thing)
+        public static AugmentedNullableStruct<T> N<T>(T? thing)
             where T : struct => new AugmentedNullableStruct<T>(thing);
     }
 }

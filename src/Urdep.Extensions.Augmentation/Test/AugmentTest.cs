@@ -1,7 +1,7 @@
 using NUnit;
 using NUnit.Framework;
 
-namespace Urdep.Extensions.Augment;
+namespace Urdep.Extensions.Augmentation.Test;
 
 public class AugmentTest
 {
