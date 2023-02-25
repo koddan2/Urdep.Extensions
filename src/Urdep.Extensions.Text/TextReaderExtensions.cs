@@ -16,6 +16,7 @@ public record TextReaderBlockSkipState(
 {
     public bool Skipping { get; set; } = false;
 };
+
 public readonly record struct TextReaderBlockSkipResult(bool Skip, string? Line);
 
 public static class TextReaderExtensions
@@ -35,7 +36,10 @@ public static class TextReaderExtensions
         return sb.ToString();
     }
 
-    public static TextReaderBlockSkipResult ReadLine(this TextReaderBlockSkipState state, TextReader reader)
+    public static TextReaderBlockSkipResult ReadLine(
+        this TextReaderBlockSkipState state,
+        TextReader reader
+    )
     {
         var line = state.TrimMode switch
         {
