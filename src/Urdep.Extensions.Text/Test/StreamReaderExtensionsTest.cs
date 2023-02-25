@@ -19,19 +19,48 @@ Important data
             @"Hello
 Important data
 ";
-        var stream = new MemoryStream(Encoding.Default.GetBytes(text));
-        var reader = new StreamReader(stream);
+        using var reader = new StringReader(text);
         var sb = new StringBuilder();
-        var state = new StreamReaderSkipBlocksState("--[[SKIP", "--]]");
-        while (!reader.EndOfStream)
+        var state = new TextReaderBlockSkipState("--[[SKIP", "--]]");
+        TextReaderBlockSkipResult readResult;
+        do
         {
-            var line = (reader, state).ReadLine();
-            if (line is not null)
+            readResult = state.ReadLine(reader);
+            if (!readResult.Skip)
             {
-                sb.AppendLine(line);
+                sb.AppendLine(readResult.Line);
             }
-        }
+        } while (readResult.Line is not null);
         var actual = sb.ToString();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(actual, Is.EqualTo(expected));
+        });
+    }
+
+    [Test]
+    public void TestBasic2()
+    {
+        var text =
+            @"Hello
+--[[SKIP
+some gibberish
+--]]
+Important data
+
+--[[SKIP
+some MORE gibberish
+--]]
+";
+        var expected =
+            @"Hello
+Important data
+
+";
+        using var reader = new StringReader(text);
+        var state = new TextReaderBlockSkipState("--[[SKIP", "--]]");
+        var actual = state.ReadAll(reader);
 
         Assert.Multiple(() =>
         {
