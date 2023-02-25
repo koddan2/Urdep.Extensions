@@ -1,6 +1,6 @@
 param(
     $Configuration = "Release",
-    $ArtefactDir = "obj"
+    $ArtefactDir
 )
 
 task Format-Source {
@@ -24,7 +24,14 @@ task Build Test, {
 task Pack Test, {
     dotnet pack `
         --nologo `
+        --output $ArtefactDir `
+        --include-symbols `
+        --include-source `
         --configuration $Configuration
+}
+
+task Clean {
+    remove bin, obj, .vs
 }
 
 task . Format-Source

@@ -17,7 +17,7 @@ task Format-Source {
     }
 }
 
-task Test Format-Source, {
+task Test {
     $allCsProj | Foreach-Object -ThrottleLimit $ThrottleLimit -Parallel {
         $dir = [System.IO.Path]::GetDirectoryName($PSItem)
         Push-Location $dir
@@ -33,20 +33,38 @@ task Restore {
     }
 }
 
-task Build Test, {
+task Build {
     $allCsProj | Foreach-Object -ThrottleLimit $ThrottleLimit -Parallel {
         $dir = [System.IO.Path]::GetDirectoryName($PSItem)
         Push-Location $dir
-        Invoke-Build Build
+        Invoke-Build Build -Configuration $USING:Configuration -ArtefactDir $USING:ArtefactDir
     }
 }
 
-task Pack Test, {
+task Pack {
+    if (![System.IO.Path]::IsPathFullyQualified($ArtefactDir)) {
+        $output = [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $ArtefactDir))
+    }
+    else {
+        $output = $ArtefactDir
+    }
     $allCsProj | Foreach-Object -ThrottleLimit $ThrottleLimit -Parallel {
         $dir = [System.IO.Path]::GetDirectoryName($PSItem)
         Push-Location $dir
-        Invoke-Build Pack
+        Invoke-Build Pack `
+            -File (Get-ChildItem *.build.ps1) `
+            -Configuration $USING:Configuration `
+            -ArtefactDir $USING:output
     }
+}
+
+task Clean {
+    $allCsProj | Foreach-Object -ThrottleLimit $ThrottleLimit -Parallel {
+        $dir = [System.IO.Path]::GetDirectoryName($PSItem)
+        Push-Location $dir
+        Invoke-Build Clean
+    }
+    remove $ArtefactDir, src/.vs
 }
 
 task . Format-Source
