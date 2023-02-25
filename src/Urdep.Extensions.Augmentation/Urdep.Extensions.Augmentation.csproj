@@ -3,7 +3,22 @@
         <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>0.0.1</Version>
+        <Version>0.0.4</Version>
+        <PackageId>Urdep.Extensions.Augmentation</PackageId>
+        <Authors>koddan2@outlook.com</Authors>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/koddan2/Urdep.Extensions</PackageProjectUrl>
+        <PackageVersion>0.1.0</PackageVersion>
+        <Description>
+            This library is mainly for use when you want to augment
+            a base type with extension methods, e.g. object or int,
+            but don't want to pollute the method list all over the
+            place. So you would create your extension method
+            targeting IAugmented&lt;T&gt; and then use the
+            Augment.[C|D|N|S] helper methods to instantiate
+            the relevant wrapper type.
+            See Urdep.Extensions.Data for usage examples.
+        </Description>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(Configuration)' == 'Release'">
