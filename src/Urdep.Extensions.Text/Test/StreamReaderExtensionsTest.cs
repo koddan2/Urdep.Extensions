@@ -33,10 +33,7 @@ Important data
         } while (readResult.Line is not null);
         var actual = sb.ToString();
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(actual, Is.EqualTo(expected));
-        });
+        Assert.That(actual, Is.EqualTo(expected));
     }
 
     [Test]
@@ -50,21 +47,22 @@ some gibberish
 Important data
 
 --[[SKIP
+--]]
+--[[SKIP
 some MORE gibberish
 --]]
+TEST~
 ";
         var expected =
             @"Hello
 Important data
 
+TEST~
 ";
         using var reader = new StringReader(text);
         var state = new TextReaderBlockSkipState("--[[SKIP", "--]]");
         var actual = state.ReadAll(reader);
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(actual, Is.EqualTo(expected));
-        });
+        Assert.That(actual, Is.EqualTo(expected));
     }
 }

@@ -4,34 +4,40 @@ param(
 )
 
 task Format-Source {
-    dotnet tool run dotnet-csharpier .
+    exec { dotnet tool run dotnet-csharpier . }
 }
 
 task Test Format-Source, {
-    dotnet test
+    exec { dotnet test }
 }
 
 task Restore {
-    dotnet restore
+    exec { dotnet restore }
 }
 
 task Build Test, {
-    dotnet build `
-        --nologo `
-        --configuration $Configuration
+    exec {
+        dotnet build `
+            --nologo `
+            --configuration $Configuration
+    }
 }
 
 task Pack Test, {
-    dotnet pack `
-        --nologo `
-        --output $ArtefactDir `
-        --include-symbols `
-        --include-source `
-        --configuration $Configuration
+    exec {
+        dotnet pack `
+            --nologo `
+            --output $ArtefactDir `
+            --include-symbols `
+            --include-source `
+            --configuration $Configuration
+    }
 }
 
 task Clean {
-    remove bin, obj, .vs
+    exec {
+        remove bin, obj, .vs
+    }
 }
 
 task . Format-Source
