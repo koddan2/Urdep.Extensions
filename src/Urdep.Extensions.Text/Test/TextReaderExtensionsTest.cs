@@ -65,4 +65,38 @@ TEST~
 
         Assert.That(actual, Is.EqualTo(expected));
     }
+
+    [Test]
+    public void TestBasic3()
+    {
+        var text =
+            @"Hello
+--[[SKIP
+some gibberish
+--]]
+Important data
+";
+        var expected =
+            @"Hello
+Important data
+";
+        using var reader = new StringReader(text);
+        var sb = new StringBuilder();
+        var state = new TextReaderBlockSkipState("--[[SKIP", "--]]");
+
+        for (
+            TextReaderBlockSkipResult readResult = new(true, string.Empty);
+            readResult.Line is not null;
+            readResult = state.ReadLine(reader)
+        )
+        {
+            if (!readResult.Skip)
+            {
+                sb.AppendLine(readResult.Line);
+            }
+        }
+        var actual = sb.ToString();
+
+        Assert.That(actual, Is.EqualTo(expected));
+    }
 }
