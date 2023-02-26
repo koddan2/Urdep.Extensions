@@ -1,6 +1,5 @@
 ﻿using CsvHelper.Configuration;
 using Microsoft.Extensions.FileSystemGlobbing;
-using System.Data.Common;
 using System.Diagnostics;
 using Urdep.Extensions.Text;
 
@@ -105,17 +104,17 @@ internal class Program
             {
                 case "--directory":
                 case "-d":
-                    arguments.Directories.Add(Path.GetFullPath(args[++i]));
+                    arguments.Directories.Add(RequiredArgument(args, ++i, "--directory/-d", Path.GetFullPath));
                     continue;
 
                 case "--include":
                 case "-i":
-                    arguments.Includes.Add(args[++i]);
+                    arguments.Includes.Add(RequiredArgument(args, ++i, "--include/-i"));
                     continue;
 
                 case "--exclude":
                 case "-x":
-                    arguments.Excludes.Add(args[++i]);
+                    arguments.Excludes.Add(RequiredArgument(args, ++i, "--exlude/-x"));
                     continue;
 
                 default:
@@ -124,6 +123,31 @@ internal class Program
             }
         }
 
+        Default(arguments.Directories, () => Path.GetFullPath("."));
+        Default(arguments.Includes, () => "*.*");
+
         return 0;
+    }
+
+    private static void Default<T>(ICollection<T> argument, Func<T> value)
+    {
+        if (!argument.Any())
+        {
+            argument.Add(value());
+        }
+    }
+
+    private static string RequiredArgument(string[] args, int i, string name)
+    {
+        if (args.Length + 1 < i || args[i].StartsWith("-"))
+        {
+            throw new ApplicationException($"Invalid command line: argument {name} requires a value");
+        }
+        return args[i];
+    }
+
+    private static T RequiredArgument<T>(string[] args, int i, string name, Func<string, T> transform)
+    {
+        return transform.Invoke(RequiredArgument(args, i, name));
     }
 }
