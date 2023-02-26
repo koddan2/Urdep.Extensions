@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Align": {
+      "commandName": "Project",
+      "commandLineArgs": "-d ./Test -i *.csv"
+    }
+  }
+}
