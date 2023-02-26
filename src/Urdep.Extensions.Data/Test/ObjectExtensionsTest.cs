@@ -23,7 +23,7 @@ public class ObjectExtensionsTest
             StrValue = "Hello",
             RefValue = new()
         };
-        var aug = Augment.C(startInstance);
+        var aug = Augment.Ref(startInstance);
         var dict = aug.AsDictionary();
         Assert.Multiple(() =>
         {
