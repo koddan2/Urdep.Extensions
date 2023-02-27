@@ -4,12 +4,12 @@
         <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>0.1.0</Version>
+        <Version>0.2.0</Version>
         <PackageId>Urdep.Extensions.Text</PackageId>
         <Authors>koddan2@outlook.com</Authors>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/koddan2/Urdep.Extensions</PackageProjectUrl>
-        <PackageVersion>0.1.0</PackageVersion>
+        <PackageVersion>0.2.0</PackageVersion>
         <Description>
             Utility functions for doing stuff with text.
         </Description>

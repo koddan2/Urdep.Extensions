@@ -40,22 +40,44 @@ task Test {
 
 task Restore {
     # exec {
-    $allCsProj | Foreach-Object -ThrottleLimit $ThrottleLimit -Parallel {
-        $dir = [System.IO.Path]::GetDirectoryName($PSItem)
-        Push-Location $dir
-        Invoke-Build Restore
-    }
+    # $allCsProj | Foreach-Object -ThrottleLimit $ThrottleLimit -Parallel {
+    #     $dir = [System.IO.Path]::GetDirectoryName($PSItem)
+    #     Push-Location $dir
+    #     Invoke-Build Restore
     # }
+    # }
+    $tasks = New-Object System.Collections.ArrayList
+    foreach ($csproj in $allCsProj) {
+        $dir = [System.IO.Path]::GetDirectoryName($csproj)
+        $invocation = [hashtable]@{
+            File = Get-ChildItem (Join-Path $dir "*.build.ps1")
+            Task = "Restore"
+        }
+        $tasks.Add($invocation)
+    }
+    write-host $tasks
+    Build-Parallel $tasks
 }
 
 task Build {
     # exec {
-    $allCsProj | Foreach-Object -ThrottleLimit $ThrottleLimit -Parallel {
-        $dir = [System.IO.Path]::GetDirectoryName($PSItem)
-        Push-Location $dir
-        Invoke-Build Build -Configuration $USING:Configuration -ArtefactDir $USING:ArtefactDir
-    }
+    # $allCsProj | Foreach-Object -ThrottleLimit $ThrottleLimit -Parallel {
+    #     $dir = [System.IO.Path]::GetDirectoryName($PSItem)
+    #     Push-Location $dir
+    #     Invoke-Build Build -Configuration $USING:Configuration -ArtefactDir $USING:ArtefactDir
     # }
+    # }
+    $tasks = New-Object System.Collections.ArrayList
+    foreach ($csproj in $allCsProj) {
+        $dir = [System.IO.Path]::GetDirectoryName($csproj)
+        $invocation = [hashtable]@{
+            File = Get-ChildItem (Join-Path $dir "*.build.ps1")
+            Task = "Build"
+        }
+        $tasks.Add($invocation)
+    }
+    write-host $tasks
+    Build-Parallel $tasks
 }
 
 task Pack {
