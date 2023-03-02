@@ -1,4 +1,3 @@
-using NUnit;
 using NUnit.Framework;
 
 namespace Urdep.Extensions.Augmentation.Test;
@@ -45,7 +44,9 @@ public class AugmentTest
         Assert.Multiple(() =>
         {
             var a1 = Augment.Ref(i);
+#pragma warning disable IDE0150 // Prefer 'null' check over type check
             Assert.That(a1 is AugmentedRef<object>, Is.True);
+#pragma warning restore IDE0150 // Prefer 'null' check over type check
             var a2 = Augment.Ref(i);
             Assert.That(a1, Is.EqualTo(a2));
             Assert.That(a1 is IAugmented<object>, Is.True);
@@ -60,7 +61,9 @@ public class AugmentTest
         Assert.Multiple(() =>
         {
             var a1 = Augment.NotNull(i);
+#pragma warning disable IDE0150 // Prefer 'null' check over type check
             Assert.That(a1 is AugmentedNotNull<object>, Is.True);
+#pragma warning restore IDE0150 // Prefer 'null' check over type check
             var a2 = Augment.NotNull(i);
             Assert.That(a1, Is.EqualTo(a2));
             Assert.That(a1 is IAugmented<object>, Is.True);

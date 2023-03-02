@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Urdep.Extensions.Text;
 
 namespace Align;
+
 internal class Program
 {
     internal static readonly Arguments arguments = new();
@@ -49,15 +50,22 @@ internal class Program
 
                 {
                     using var streamReader = new StreamReader(file, arguments.FileEncoding);
-                    var cfg = new CsvConfiguration(arguments.FileCulture) { TrimOptions = TrimOptions.Trim };
+                    var cfg = new CsvConfiguration(arguments.FileCulture)
+                    {
+                        TrimOptions = TrimOptions.Trim
+                    };
                     using var csv = new CsvHelper.CsvReader(streamReader, cfg);
                     delimiter = csv.Context.Parser.Delimiter;
 
                     csv.Read();
                     csv.ReadHeader();
 
-                    columns = csv.HeaderRecord
-                        ?? Enumerable.Range(1, csv.ColumnCount).Select(x => x.ToString(arguments.FileCulture)).ToArray();
+                    columns =
+                        csv.HeaderRecord
+                        ?? Enumerable
+                            .Range(1, csv.ColumnCount)
+                            .Select(x => x.ToString(arguments.FileCulture))
+                            .ToArray();
                     while (csv.Read())
                     {
                         var record = new Dictionary<string, string>();
@@ -70,12 +78,20 @@ internal class Program
                     }
                 }
 
-                var aligner = new CsvColumnAligner(columns.ToDictionary(x => x, x => x), records, PadSide.Right);
+                var aligner = new CsvColumnAligner(
+                    columns.ToDictionary(x => x, x => x),
+                    records,
+                    PadSide.Right
+                );
                 aligner.AlignColumns();
 
                 {
                     using var streamWriter = new StreamWriter(file, false, arguments.FileEncoding);
-                    var cfg = new CsvConfiguration(arguments.FileCulture) { Delimiter = delimiter, ShouldQuote = c => c.Field.Contains(delimiter), };
+                    var cfg = new CsvConfiguration(arguments.FileCulture)
+                    {
+                        Delimiter = delimiter,
+                        ShouldQuote = c => c.Field.Contains(delimiter),
+                    };
                     using var csv = new CsvHelper.CsvWriter(streamWriter, cfg);
                     foreach (var column in aligner.Columns.Values)
                     {
@@ -104,7 +120,9 @@ internal class Program
             {
                 case "--directory":
                 case "-d":
-                    arguments.Directories.Add(RequiredArgument(args, ++i, "--directory/-d", Path.GetFullPath));
+                    arguments.Directories.Add(
+                        RequiredArgument(args, ++i, "--directory/-d", Path.GetFullPath)
+                    );
                     continue;
 
                 case "--include":
@@ -141,12 +159,19 @@ internal class Program
     {
         if (args.Length + 1 < i || args[i].StartsWith("-"))
         {
-            throw new ApplicationException($"Invalid command line: argument {name} requires a value");
+            throw new ApplicationException(
+                $"Invalid command line: argument {name} requires a value"
+            );
         }
         return args[i];
     }
 
-    private static T RequiredArgument<T>(string[] args, int i, string name, Func<string, T> transform)
+    private static T RequiredArgument<T>(
+        string[] args,
+        int i,
+        string name,
+        Func<string, T> transform
+    )
     {
         return transform.Invoke(RequiredArgument(args, i, name));
     }

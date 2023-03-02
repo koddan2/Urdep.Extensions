@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "TrackingCopyTool": {
+        "commandName": "Project",
+        "commandLineArgs": "-d Test --Target:Name Output --Target:Create true"
+    },
+
+    "TrackingCopyTool II": {
+      "commandName": "Project",
+      "commandLineArgs": "-d c:/temp/src --Target:Name c:/temp/tgt --Target:Create true"
+    }
+  }
+}
