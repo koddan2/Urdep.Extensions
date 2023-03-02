@@ -7,7 +7,7 @@
 
     "TrackingCopyTool II": {
       "commandName": "Project",
-      "commandLineArgs": "-d c:/temp/src --Target:Name c:/temp/tgt --Target:Create true"
+      "commandLineArgs": "-d c:/temp/src --Target:Name c:/temp/tgt --Target:Create true -v 1"
     }
   }
 }

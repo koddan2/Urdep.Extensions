@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Security.Cryptography;
@@ -13,24 +15,31 @@ namespace TrackingCopyTool;
 internal class Program
 {
     private static readonly Dictionary<string, string> _Stage0SwitchMappings =
-        new() { ["-c"] = "ConfigurationFile", };
+        new() { ["-c"] = "ConfigurationFile" };
 
     private static readonly Dictionary<string, string> _Stage1SwitchMappings =
         new()
         {
+            ["-v"] = "Verbose",
             ["-d"] = "Directory",
             ["-i"] = "Includes",
             ["-x"] = "Excludes",
             ["-m"] = "ManifestFile",
         };
 
+    // Logging level switch that will be used
+    public static readonly LoggingLevelSwitch AppLoggingLevelSwitch = new LoggingLevelSwitch(
+        LogEventLevel.Information
+    );
+
     private static readonly ISerializer _Serializer = new SerializerBuilder().Build();
     private static readonly IDeserializer _Deserializer = new DeserializerBuilder().Build();
+    private static readonly string _DefaultManifestFile = ".TrackingCopyTool.manifest.yaml";
 
     private static int Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration().MinimumLevel
-            .Debug()
+            .ControlledBy(AppLoggingLevelSwitch)
             .Enrich.FromLogContext()
             .WriteTo.Console()
             .CreateLogger();
@@ -45,19 +54,30 @@ internal class Program
             .AddExtraConfigurationSources(initialCfg)
             .Build();
 
-        var programCfg = cfg.Get<ProgramCfg>();
-        if (programCfg is null)
+        var dbg = cfg.GetDebugView();
+        if (AsInt(cfg["Verbose"]) is int verbosity)
         {
-            Log.Error("Could not parse configuration");
-            return 1;
+            if (verbosity == 0)
+            {
+                AppLoggingLevelSwitch.MinimumLevel = LogEventLevel.Fatal;
+            }
+            else if (verbosity == 1)
+            {
+                AppLoggingLevelSwitch.MinimumLevel = LogEventLevel.Information;
+            }
+            else if (verbosity == 2)
+            {
+                AppLoggingLevelSwitch.MinimumLevel = LogEventLevel.Debug;
+            }
+            else if (verbosity >= 3)
+            {
+                AppLoggingLevelSwitch.MinimumLevel = LogEventLevel.Verbose;
+            }
         }
 
-        // to make trimming keep the ctor
-        _ = new Config.TargetElement();
-
         if (
-            (programCfg.Target?.Create is true || programCfg.Force)
-            && programCfg.Target?.Name is string targetName
+            (Truish(cfg["Target:Create"]) || Truish(cfg["Force"]))
+            && cfg["Target:Name"] is string targetName
         )
         {
             var path = Path.GetFullPath(targetName);
@@ -67,7 +87,7 @@ internal class Program
             }
         }
         var fail = false;
-        foreach (var validationError in ProgramCfg.Validate(programCfg))
+        foreach (var validationError in Validate(cfg))
         {
             fail = true;
             Log.Error("Validation error: {@error}", validationError);
@@ -77,24 +97,33 @@ internal class Program
             return 1;
         }
 
-        if (!programCfg.Includes.Any())
+        var includes = cfg["Includes"] ?? "";
+        if (string.IsNullOrEmpty(includes))
         {
-            programCfg.Includes.Add("**/*.*");
+            includes = "**/*.*";
         }
 
-        if (!programCfg.Excludes.Contains(programCfg.ManifestFile))
+        var manifestFile = cfg["ManifestFile"] ?? _DefaultManifestFile;
+        var excludes = cfg["Excludes"] ?? "";
+        if (!excludes.Contains(manifestFile))
         {
-            programCfg.Excludes.Add(programCfg.ManifestFile);
+            excludes += $",{manifestFile}";
         }
 
+        var includesArr = includes
+            .Split(new[] { "," }, StringSplitOptions.TrimEntries)
+            .Where(x => !string.IsNullOrEmpty(x));
+        var excludesArr = excludes
+            .Split(new[] { "," }, StringSplitOptions.TrimEntries)
+            .Where(x => !string.IsNullOrEmpty(x));
         Matcher matcher = new();
-        matcher.AddIncludePatterns(programCfg.Includes);
-        matcher.AddExcludePatterns(programCfg.Excludes);
+        matcher.AddIncludePatterns(includesArr);
+        matcher.AddExcludePatterns(excludesArr);
 
-        var sourceDir = Path.GetFullPath(programCfg.Directory!);
+        var sourceDir = Path.GetFullPath(cfg["Directory"]!);
         if (sourceDir == null)
         {
-            Log.Error("Failed getting full path to {dir}", programCfg.Directory!);
+            Log.Error("Failed getting full path to {dir}", cfg["Directory"]);
             return 1;
         }
 
@@ -103,10 +132,15 @@ internal class Program
         var sourceMatches = matcher.GetResultsInFullPath(sourceDir);
 
         var hashes = ComputeManifest(sourceDir, sourceMatches, hashAlgo);
-        WriteManifest(programCfg, sourceDir, hashes);
+        WriteManifest(manifestFile, sourceDir, hashes);
 
-        var targetDir = programCfg.Target!.Name!;
-        var targetManifest = Path.Combine(targetDir, programCfg.ManifestFile);
+        var targetDir = cfg["Target:Name"];
+        if (targetDir is null)
+        {
+            Log.Error("No target is defined.");
+            return 1;
+        }
+        var targetManifest = Path.Combine(targetDir!, manifestFile);
         Dictionary<string, string>? targetHashes = null;
         if (File.Exists(targetManifest))
         {
@@ -115,7 +149,7 @@ internal class Program
 
         var matchesRelPaths = sourceMatches.Select(x => Path.GetRelativePath(sourceDir, x));
 
-        var force = programCfg.Force is true;
+        var force = Truish(cfg["Force"]);
         var needsUpdate = false;
         long copiedBytes = 0;
         long unCopiedBytes = 0;
@@ -156,17 +190,59 @@ internal class Program
 
         if (needsUpdate)
         {
-            var src = Path.Combine(sourceDir, programCfg.ManifestFile);
-            var tgt = Path.Combine(targetDir, programCfg.ManifestFile);
-            Log.Verbose("Copying {path}", programCfg.ManifestFile);
+            var src = Path.Combine(sourceDir, manifestFile);
+            var tgt = Path.Combine(targetDir, manifestFile);
+            Log.Verbose("Copying {path}", manifestFile);
             File.Copy(src, tgt, true);
-            Log.Debug("Copied {path}", programCfg.ManifestFile);
+            Log.Debug("Copied {path}", manifestFile);
         }
 
         Log.Information("Copied a total of {byteCount:f2} kB", copiedBytes / 1000d);
         Log.Information("Did not copy a total of {byteCount:f2} kB", unCopiedBytes / 1000d);
         Log.Information("Normal exit - duration: {time}", sw.Elapsed);
         return 0;
+    }
+
+    private static IEnumerable<string> Validate(IConfiguration cfg)
+    {
+        List<string> errors = new();
+        CheckDirectory(errors, cfg, "Directory");
+        CheckDirectory(errors, cfg, "Target:Name");
+
+        return errors;
+    }
+
+    private static void CheckDirectory(List<string> errors, IConfiguration cfg, string arg)
+    {
+        var v = cfg[arg];
+        if (v is null)
+        {
+            errors.Add($"Argument {arg} for directory is null.");
+        }
+
+        if (!Directory.Exists(v ?? ""))
+        {
+            errors.Add($"Directory {v} does not exist.");
+        }
+    }
+
+    private static int? AsInt(string? v)
+    {
+        if (int.TryParse(v, out int result))
+        {
+            return result;
+        }
+        return null;
+    }
+
+    private static bool Truish(string? v)
+    {
+        if (v is string s)
+        {
+            var upper = s.ToUpper();
+            return upper == "TRUE" || upper == "Y" || upper == "YES" || upper == "1";
+        }
+        return false;
     }
 
     private static Dictionary<string, string> ReadManifest(string targetManifest)
@@ -176,12 +252,12 @@ internal class Program
     }
 
     private static void WriteManifest(
-        ProgramCfg programCfg,
+        string manifestFilename,
         string sourceDir,
         Dictionary<string, string> hashes
     )
     {
-        var manifestFile = Path.Combine(sourceDir, programCfg.ManifestFile);
+        var manifestFile = Path.Combine(sourceDir, manifestFilename);
 
         var yaml = _Serializer.Serialize(hashes);
         File.WriteAllText(manifestFile, yaml);
