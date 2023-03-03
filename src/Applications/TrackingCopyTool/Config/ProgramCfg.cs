@@ -1,40 +1,151 @@
-﻿namespace TrackingCopyTool.Config;
+﻿using Microsoft.Extensions.Configuration;
+using System.Diagnostics;
+
+namespace TrackingCopyTool.Config;
+
+////internal class ConfigError
+////{
+////    public string? Message { get; init; }
+////}
+////internal class RetrievalResult<T>
+////{
+////    public T? Value { get; set; }
+////    public ConfigError? Error { get; set; }
+////}
+internal static class Values
+{
+    internal static bool Truish(this string? v)
+    {
+        if (v is string s)
+        {
+            var upper = s.ToUpper();
+            return upper == "TRUE" || upper == "Y" || upper == "YES" || upper == "1";
+        }
+        return false;
+    }
+}
+
+internal static class Optional
+{
+    public static ICollection<string> Csv(
+        IConfiguration conf,
+        string key,
+        Func<ICollection<string>, ICollection<string>> transformer
+    )
+    {
+        var val = conf[key];
+        List<string> result = new();
+        if (!string.IsNullOrEmpty(val))
+        {
+            result.AddRange(val.Split(new[] { "," }, StringSplitOptions.TrimEntries));
+        }
+
+        return transformer(result);
+    }
+
+    public static bool Bool(IConfiguration conf, string key)
+    {
+        return Values.Truish(conf[key]);
+    }
+
+    public static string String(IConfiguration conf, string key, string? defaultValue = null)
+    {
+        var val = conf[key];
+        return val ?? defaultValue ?? "";
+    }
+
+    public static int Int(IConfiguration conf, string key, int? defaultValue)
+    {
+        return AsInt(conf[key]) ?? defaultValue ?? default;
+    }
+
+    private static int? AsInt(string? v)
+    {
+        if (int.TryParse(v, out int result))
+        {
+            return result;
+        }
+        return null;
+    }
+}
+
+internal static class Required
+{
+    public static string Directory(IConfiguration conf, string key)
+    {
+        var path = conf[key];
+        ArgumentException.ThrowIfNullOrEmpty(path);
+        if (!System.IO.Directory.Exists(path))
+        {
+            throw new ApplicationException($"Directory {path} does not exist.");
+        }
+
+        return path;
+    }
+
+    public static string String(IConfiguration conf, string key)
+    {
+        return String(conf, key, null);
+    }
+
+    public static string String(IConfiguration conf, string key, string? defaultValue = null)
+    {
+        var val = conf[key];
+        return val
+            ?? defaultValue
+            ?? throw new ApplicationException($"No value was supplied for {key}");
+    }
+}
 
 internal class ProgramCfg
 {
-    public string? Directory { get; set; }
-    public ICollection<string> Includes { get; set; } = new List<string>();
-    public ICollection<string> Excludes { get; set; } = new List<string>();
+    private readonly IConfiguration _c;
 
-    public bool Force { get; set; } = false;
-
-    public string ManifestFile { get; set; } = ".TrackingCopyTool.manifest.yaml";
-    public TargetElement? Target { get; set; }
-
-    public static IEnumerable<string> Validate(ProgramCfg cfg)
+    public ProgramCfg(IConfiguration c)
     {
-        List<string> errors = new();
-        errors.AddRange(CheckDirectoryName(cfg.Directory, "-d"));
-        errors.AddRange(CheckDirectoryName(cfg.Target?.Name, "--Target:Name"));
-        if (string.IsNullOrEmpty(cfg.ManifestFile))
-        {
-            errors.Add("ManifestFile (-m) has no value.");
-        }
-        return errors;
+        _c = c;
     }
 
-    private static IEnumerable<string> CheckDirectoryName(string? directory, string? argName)
+    ICollection<string> DefaultIncludesTransform(ICollection<string> values)
     {
-        List<string> errors = new();
-        if (string.IsNullOrEmpty(directory))
+        if (values.Any())
         {
-            errors.Add($"Directory ({argName}) was not supplied.");
+            return values.Where(x => !string.IsNullOrEmpty(x)).ToList();
         }
-        if (!System.IO.Directory.Exists(directory))
-        {
-            errors.Add($"The directory {directory} does not exist.");
-        }
+        return new[] { "**/*.*" };
+    }
 
-        return errors;
+    public static readonly string PrivateDirectoryName = ".TrackingCopyTool";
+    public string PrivateDir => PrivateDirectoryName;
+    public string PrivateDirFullPathSource => Path.Combine(SourceDirectoryFullPath, PrivateDir);
+    public string PrivateDirFullPathTarget => Path.Combine(Target.FullPath(), PrivateDir);
+
+    ICollection<string> DefaultExcludesTransform(ICollection<string> values)
+    {
+        return Enumerable.Concat(values, new[] { Path.Combine(PrivateDir, "**") }).ToList();
+    }
+
+    public string Directory => Required.Directory(_c, "Directory");
+    public string SourceDirectoryFullPath =>
+        Path.GetFullPath(Directory)
+        ?? throw new ApplicationException($"Failed getting full path to directory: {Directory}");
+    public ICollection<string> Includes => Optional.Csv(_c, "Includes", DefaultIncludesTransform);
+    public ICollection<string> Excludes => Optional.Csv(_c, "Excludes", DefaultExcludesTransform);
+
+    public bool Force => Get("Force", Optional.Bool);
+
+    public int Verbosity => Optional.Int(_c, "Verbosity", 0);
+
+    public string ManifestFile => Optional.String(_c, "ManifestFile", "manifest.txt");
+    public string ManifestFileFullPathSource =>
+        Path.Combine(PrivateDirFullPathSource, ManifestFile);
+    public string ManifestFileFullPathTarget =>
+        Path.Combine(PrivateDirFullPathTarget, ManifestFile);
+    public TargetElement Target =>
+        new(Get("Target:Name", Required.String)) { Create = Get("Target:Create", Optional.Bool), };
+
+    private T Get<T>(string v, Func<IConfiguration, string, T> func)
+    {
+        return func(_c, v);
     }
 }

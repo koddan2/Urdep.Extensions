@@ -2,8 +2,11 @@
 
 internal class TargetElement
 {
-    public TargetElement() { }
+    public TargetElement(string name)
+    {
+        Name = name;
+    }
 
-    public string? Name { get; set; }
-    public bool? Create { get; set; } = false;
+    public string Name { get; init; }
+    public bool Create { get; init; } = false;
 }
