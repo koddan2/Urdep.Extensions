@@ -10,7 +10,7 @@
         },
         "TrackingCopyTool II": {
             "commandName": "Project",
-            "commandLineArgs": "-d c:/temp/src --Target:Name c:/temp/tgt --Target:Create true -v 2 -m special-manifest.txt"
+            "commandLineArgs": "-d c:/temp/src --Target:Name c:/temp/tgt --Target:Create true -v 2 -m special-manifest.txt --excludes **/*.2da,**/*.bic"
         },
         "TrackingCopyTool III": {
             "commandName": "Project",

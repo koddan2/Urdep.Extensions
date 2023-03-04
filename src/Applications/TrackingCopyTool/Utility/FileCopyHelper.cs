@@ -2,9 +2,9 @@
 
 namespace TrackingCopyTool.Utility
 {
-    internal class FileCopyHelper
+    internal partial class FileCopyHelper
     {
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool CopyFileEx(
             string lpExistingFileName,
@@ -28,6 +28,8 @@ namespace TrackingCopyTool.Utility
         );
 
         private int _pbCancel;
+
+        public void Cancel() => _pbCancel = 1;
 
         public enum CopyProgressResult : uint
         {
@@ -55,11 +57,23 @@ namespace TrackingCopyTool.Utility
         public void XCopyEz(
             string sourceFile,
             string targetFile,
-            Func<long, long, long, CopyProgressCallbackReason, CopyProgressResult> cb)
+            Func<long, long, long, CopyProgressCallbackReason, CopyProgressResult> cb
+        )
         {
-
-            Func<long, long, long, long, uint, CopyProgressCallbackReason, IntPtr, IntPtr, IntPtr, CopyProgressResult> wrapper =
-                (total, transferred, streamSize, _, _, reason, _, _, _) => cb(total, transferred, streamSize,reason);
+            CopyProgressResult wrapper(
+                long total,
+                long transferred,
+                long streamSize,
+                long StreamByteTrans,
+                uint dwStreamNumber,
+                CopyProgressCallbackReason reason,
+                IntPtr hSourceFile,
+                IntPtr hDestinationFile,
+                IntPtr lpData
+            )
+            {
+                return cb(total, transferred, streamSize, reason);
+            }
             CopyFileEx(
                 sourceFile,
                 targetFile,
@@ -73,7 +87,19 @@ namespace TrackingCopyTool.Utility
         public void XCopy(
             string sourceFile,
             string targetFile,
-            Func<long, long, long, long, uint, CopyProgressCallbackReason, IntPtr, IntPtr, IntPtr, CopyProgressResult> cb)
+            Func<
+                long,
+                long,
+                long,
+                long,
+                uint,
+                CopyProgressCallbackReason,
+                IntPtr,
+                IntPtr,
+                IntPtr,
+                CopyProgressResult
+            > cb
+        )
         {
             CopyFileEx(
                 sourceFile,
@@ -85,19 +111,19 @@ namespace TrackingCopyTool.Utility
             );
         }
 
-        private CopyProgressResult CopyProgressHandler(
-            long total,
-            long transferred,
-            long streamSize,
-            long StreamByteTrans,
-            uint dwStreamNumber,
-            CopyProgressCallbackReason reason,
-            IntPtr hSourceFile,
-            IntPtr hDestinationFile,
-            IntPtr lpData
-        )
-        {
-            return CopyProgressResult.PROGRESS_CONTINUE;
-        }
+        ////private static CopyProgressResult CopyProgressHandler(
+        ////    long total,
+        ////    long transferred,
+        ////    long streamSize,
+        ////    long StreamByteTrans,
+        ////    uint dwStreamNumber,
+        ////    CopyProgressCallbackReason reason,
+        ////    IntPtr hSourceFile,
+        ////    IntPtr hDestinationFile,
+        ////    IntPtr lpData
+        ////)
+        ////{
+        ////    return CopyProgressResult.PROGRESS_CONTINUE;
+        ////}
     }
 }

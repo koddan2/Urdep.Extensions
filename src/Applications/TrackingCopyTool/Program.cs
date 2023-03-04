@@ -80,6 +80,8 @@ internal class Program
 
     private static int InnerMain(string[] args)
     {
+        var startTime = DateTimeOffset.Now;
+        Console.WriteLine("Started at {0}", startTime);
         var sw = Stopwatch.StartNew();
 
         var initialConfig = new ConfigurationBuilder()
@@ -144,6 +146,8 @@ internal class Program
         long unCopiedBytes = 0;
         foreach (var path in matchesRelPaths)
         {
+            // if crash
+            ////using var writer = new StreamWriter(cfg.TemporaryManifestFileFullPathTarget, true);
             if (
                 !cfg.Force
                 && targetHashes?.TryGetValue(path, out var hash) is true
@@ -169,8 +173,23 @@ internal class Program
                 Dir.Ensure(targetFileParentDir);
 
                 Log.Verbose("COPY: {path}", path);
-                File.Copy(src, tgt, true);
-                Log.Debug("CP ✓: {path}", path);
+                //File.Copy(src, tgt, true);
+                new FileCopyHelper().XCopyEz(
+                    src,
+                    tgt,
+                    (a, b, c, d) =>
+                    {
+                        Console.Write(
+                            "\r{0} {1} {2}",
+                            $"{(100f * b / (float)a):f2}%".PadRight(10, ' '),
+                            $"{(a / 1000f):f2} kB".PadRight(25, ' '),
+                            path
+                        );
+                        return FileCopyHelper.CopyProgressResult.PROGRESS_CONTINUE;
+                    }
+                );
+                Console.WriteLine();
+                ////Log.Debug("CP ✓: {path}", path);
                 copiedBytes += new FileInfo(src).Length;
             }
         }
@@ -179,12 +198,15 @@ internal class Program
         {
             Log.Verbose("COPY: {path}", cfg.ManifestFileRel);
             File.Copy(cfg.ManifestFileFullPathSource, cfg.ManifestFileFullPathTarget, true);
-            Log.Debug("CP ✓: {path}", cfg.ManifestFileRel);
+            Console.WriteLine(">> {0}", cfg.ManifestFileRel);
         }
 
-        Log.Information("Copied a total of {byteCount:f2} kB", copiedBytes / 1000d);
-        Log.Information("Did not copy a total of {byteCount:f2} kB", unCopiedBytes / 1000d);
-        Log.Information("Normal exit - duration: {time}", sw.Elapsed);
+        Console.WriteLine("Copied a total of       {0:f2} kB", copiedBytes / 1000d);
+        Console.WriteLine("Did not copy a total of {0:f2} kB", unCopiedBytes / 1000d);
+        Console.WriteLine("Duration:               {0}", sw.Elapsed);
+        Console.WriteLine("Started at              {0}", startTime.ToString());
+        Console.WriteLine("Ended at                {0}", DateTimeOffset.Now.ToString());
+        Console.WriteLine("Normal exit (0)");
         return 0;
     }
 
