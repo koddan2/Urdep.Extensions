@@ -43,9 +43,17 @@ internal static class Optional
         return transformer(result);
     }
 
-    public static bool Bool(IConfiguration conf, string key)
+    public static bool Bool(
+        IConfiguration conf,
+        string key,
+        string[]? args = null,
+        string? shortName = null,
+        bool? isFlag = null
+    )
     {
-        return Values.Truish(conf[key]);
+        var flagDef =
+            isFlag is true && args?.Any(x => x.ToUpper() == $"--{key}" || x == shortName) is true;
+        return Values.Truish(conf[key]) || flagDef;
     }
 
     public static string String(IConfiguration conf, string key, string? defaultValue = null)
@@ -71,13 +79,17 @@ internal static class Optional
 
 internal static class Required
 {
-    public static string Directory(IConfiguration conf, string key)
+    public static string Directory(IConfiguration conf, string key, bool mustExist = false)
     {
         var path = conf[key];
         ArgumentException.ThrowIfNullOrEmpty(path);
-        if (!System.IO.Directory.Exists(path))
+        if (mustExist && !System.IO.Directory.Exists(path))
         {
             throw new ApplicationException($"Directory {path} does not exist.");
+        }
+        if (Path.GetFullPath(path) is null)
+        {
+            throw new ApplicationException($"Could not resolve full path to directory {path}");
         }
 
         return path;
@@ -100,10 +112,12 @@ internal static class Required
 internal class ProgramCfg
 {
     private readonly IConfiguration _c;
+    private readonly string[] _args;
 
-    public ProgramCfg(IConfiguration c)
+    public ProgramCfg(IConfiguration c, string[] args)
     {
         _c = c;
+        _args = args;
     }
 
     ICollection<string> DefaultIncludesTransform(ICollection<string> values)
@@ -125,27 +139,31 @@ internal class ProgramCfg
         return Enumerable.Concat(values, new[] { Path.Combine(PrivateDir, "**") }).ToList();
     }
 
-    public string Directory => Required.Directory(_c, "Directory");
+    public string Directory => Required.Directory(_c, "Directory", true);
+
     public string SourceDirectoryFullPath =>
         Path.GetFullPath(Directory)
         ?? throw new ApplicationException($"Failed getting full path to directory: {Directory}");
+
     public ICollection<string> Includes => Optional.Csv(_c, "Includes", DefaultIncludesTransform);
     public ICollection<string> Excludes => Optional.Csv(_c, "Excludes", DefaultExcludesTransform);
 
-    public bool Force => Get("Force", Optional.Bool);
+    public bool Force => Optional.Bool(_c, "Force", _args, "-f", isFlag: true);
+    public bool OnlyGenerateManifest =>
+        Optional.Bool(_c, "OnlyGenerateManifest", _args, "-g", isFlag: true);
 
     public int Verbosity => Optional.Int(_c, "Verbosity", 0);
 
     public string ManifestFile => Optional.String(_c, "ManifestFile", "manifest.txt");
+    public string ManifestFileRel =>
+        Path.GetRelativePath(SourceDirectoryFullPath, ManifestFileFullPathSource);
     public string ManifestFileFullPathSource =>
         Path.Combine(PrivateDirFullPathSource, ManifestFile);
     public string ManifestFileFullPathTarget =>
         Path.Combine(PrivateDirFullPathTarget, ManifestFile);
     public TargetElement Target =>
-        new(Get("Target:Name", Required.String)) { Create = Get("Target:Create", Optional.Bool), };
-
-    private T Get<T>(string v, Func<IConfiguration, string, T> func)
-    {
-        return func(_c, v);
-    }
+        new(Required.Directory(_c, "Target:Name", false))
+        {
+            Create = Optional.Bool(_c, "Target:Create"),
+        };
 }

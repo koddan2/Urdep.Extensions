@@ -24,6 +24,7 @@ internal class Program
             ["-i"] = "Includes",
             ["-x"] = "Excludes",
             ["-m"] = "ManifestFile",
+            ["-g"] = "OnlyGenerateManifest",
         };
 
     // Logging level switch that will be used
@@ -34,7 +35,6 @@ internal class Program
     {
         Log.Logger = new LoggerConfiguration().MinimumLevel
             .ControlledBy(AppLoggingLevelSwitch)
-            .Enrich.FromLogContext()
             .WriteTo.Console()
             .CreateLogger();
         try
@@ -43,7 +43,7 @@ internal class Program
             {
                 var assemblyLoc =
                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
-                    ?? throw new ApplicationException("Unknown");
+                    ?? Path.GetFullPath(".");
 
                 var target = Path.GetFullPath(args[1]);
                 var targetPriv = Path.Combine(target, ProgramCfg.PrivateDirectoryName);
@@ -63,7 +63,7 @@ internal class Program
             }
             else
             {
-                InnerMain(args);
+                return InnerMain(args);
             }
             return 0;
         }
@@ -90,11 +90,17 @@ internal class Program
             .AddAllConfigurationSources(initialConfig)
             .Build();
 
-        var cfg = new ProgramCfg(config);
+        var cfg = new ProgramCfg(config, args);
+
+        Log.Information("Source: {source}", cfg.SourceDirectoryFullPath);
+        if (!cfg.OnlyGenerateManifest)
+        {
+            Log.Information("Target: {target}", cfg.Target.FullPath());
+        }
 
         SetVerbosity(cfg);
 
-        if (cfg.Target.Create || cfg.Force)
+        if (!cfg.OnlyGenerateManifest && (cfg.Target.Create || cfg.Force))
         {
             var path = cfg.Target.FullPath();
             Dir.Ensure(path);
@@ -105,17 +111,25 @@ internal class Program
         matcher.AddExcludePatterns(cfg.Excludes);
 
         var sourceDir = cfg.SourceDirectoryFullPath;
-        var targetDir = cfg.Target.FullPath();
 
         using var hashAlgo = Hashing.GetHashAlgorithmInstance(HashAlgo.SHA256);
 
         var sourceMatches = matcher.GetResultsInFullPath(sourceDir);
 
         Dir.Ensure(cfg.PrivateDirFullPathSource);
-        Dir.Ensure(cfg.PrivateDirFullPathTarget);
 
         var hashes = ComputeManifest(sourceDir, sourceMatches, hashAlgo);
         WriteManifest(cfg, hashes);
+
+        if (cfg.OnlyGenerateManifest)
+        {
+            var outfile = cfg.ManifestFileFullPathSource;
+            Log.Information("Manifest generated in {time}: {path} - exiting.", sw.Elapsed, outfile);
+            return 0;
+        }
+
+        var targetDir = cfg.Target.FullPath();
+        Dir.Ensure(cfg.PrivateDirFullPathTarget);
 
         Dictionary<string, string>? targetHashes = null;
         if (File.Exists(cfg.ManifestFileFullPathTarget))
@@ -154,18 +168,18 @@ internal class Program
 
                 Dir.Ensure(targetFileParentDir);
 
-                Log.Verbose("Copying: {path}", path);
+                Log.Verbose("COPY: {path}", path);
                 File.Copy(src, tgt, true);
-                Log.Debug("Copied: {path}", path);
+                Log.Debug("CP ✓: {path}", path);
                 copiedBytes += new FileInfo(src).Length;
             }
         }
 
         if (needsUpdate)
         {
-            Log.Verbose("Copying {path}", cfg.ManifestFileFullPathSource);
+            Log.Verbose("COPY: {path}", cfg.ManifestFileRel);
             File.Copy(cfg.ManifestFileFullPathSource, cfg.ManifestFileFullPathTarget, true);
-            Log.Debug("Copied {path}", cfg.ManifestFileFullPathSource);
+            Log.Debug("CP ✓: {path}", cfg.ManifestFileRel);
         }
 
         Log.Information("Copied a total of {byteCount:f2} kB", copiedBytes / 1000d);

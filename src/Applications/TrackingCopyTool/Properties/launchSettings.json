@@ -8,10 +8,17 @@
             "commandName": "Project",
             "commandLineArgs": "-d Test --Target:Name Output --Target:Create true"
         },
-
         "TrackingCopyTool II": {
             "commandName": "Project",
             "commandLineArgs": "-d c:/temp/src --Target:Name c:/temp/tgt --Target:Create true -v 2 -m special-manifest.txt"
+        },
+        "TrackingCopyTool III": {
+            "commandName": "Project",
+            "commandLineArgs": "-d c:/temp/src -g"
+        },
+        "TrackingCopyTool IV": {
+            "commandName": "Project",
+            "commandLineArgs": "-d C:\\CODE\\.local-nuget-staging\\ -g -v 3"
         }
     }
 }
