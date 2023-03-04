@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.Reflection;
+using System.Text.Json;
 
 namespace TrackingCopyTool.Config;
 
@@ -40,7 +41,11 @@ internal static class ProgramCfgExtensions
         }
         else if (ext == ".json")
         {
-            return builder.AddJsonFile(file, false);
+            var dict = JsonSerializer.Deserialize<Dictionary<string, string?>>(file);
+            if (dict is not null)
+            {
+                return builder.AddInMemoryCollection(dict.AsEnumerable());
+            }
         }
 
         return builder;

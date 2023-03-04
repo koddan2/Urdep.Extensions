@@ -1,8 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileSystemGlobbing;
-using Serilog;
-using Serilog.Core;
-using Serilog.Events;
 using System.Diagnostics;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -27,16 +24,8 @@ internal class Program
             ["-g"] = "OnlyGenerateManifest",
         };
 
-    // Logging level switch that will be used
-    public static readonly LoggingLevelSwitch AppLoggingLevelSwitch =
-        new(LogEventLevel.Information);
-
     private static int Main(string[] args)
     {
-        Log.Logger = new LoggerConfiguration().MinimumLevel
-            .ControlledBy(AppLoggingLevelSwitch)
-            .WriteTo.Console()
-            .CreateLogger();
         try
         {
             if (args[0] == "install")
@@ -47,7 +36,7 @@ internal class Program
 
                 var target = Path.GetFullPath(args[1]);
                 var targetPriv = Path.Combine(target, ProgramCfg.PrivateDirectoryName);
-                InnerMain(
+                return InnerMain(
                     new[]
                     {
                         "-d",
@@ -65,17 +54,15 @@ internal class Program
             {
                 return InnerMain(args);
             }
-            return 0;
         }
         catch (Exception exn)
         {
-            Log.Error("Error: {msg}", exn.Message);
+            Console.WriteLine("ERR: {0}", exn.Message);
             return 1;
         }
-        finally
-        {
-            Log.CloseAndFlush();
-        }
+        ////finally
+        ////{
+        ////}
     }
 
     private static int InnerMain(string[] args)
@@ -94,13 +81,11 @@ internal class Program
 
         var cfg = new ProgramCfg(config, args);
 
-        Log.Information("Source: {source}", cfg.SourceDirectoryFullPath);
+        Console.WriteLine("Source: {0}", cfg.SourceDirectoryFullPath);
         if (!cfg.OnlyGenerateManifest)
         {
-            Log.Information("Target: {target}", cfg.Target.FullPath());
+            Console.WriteLine("Target: {0}", cfg.Target.FullPath());
         }
-
-        SetVerbosity(cfg);
 
         if (!cfg.OnlyGenerateManifest && (cfg.Target.Create || cfg.Force))
         {
@@ -126,7 +111,7 @@ internal class Program
         if (cfg.OnlyGenerateManifest)
         {
             var outfile = cfg.ManifestFileFullPathSource;
-            Log.Information("Manifest generated in {time}: {path} - exiting.", sw.Elapsed, outfile);
+            Console.WriteLine("Manifest generated in {0}: {1} - exiting.", sw.Elapsed, outfile);
             return 0;
         }
 
@@ -154,7 +139,7 @@ internal class Program
                 && hashes[path] == hash
             )
             {
-                Log.Debug("SAME: {path}", path);
+                Console.WriteLine("SAME: {0}", path);
                 unCopiedBytes += new FileInfo(Path.Combine(sourceDir, path)).Length;
             }
             else
@@ -166,25 +151,20 @@ internal class Program
                 var targetFileParentDir = Path.GetDirectoryName(tgt);
                 if (targetFileParentDir is null)
                 {
-                    Log.Error("Could not determine target directory for {file}", tgt);
+                    Console.WriteLine("Could not determine target directory for {0}", tgt);
                     return 1;
                 }
 
                 Dir.Ensure(targetFileParentDir);
 
-                Log.Verbose("COPY: {path}", path);
-                //File.Copy(src, tgt, true);
+                ////Console.WriteLine("COPY: {0}", path);
+                ////File.Copy(src, tgt, true);
                 new FileCopyHelper().XCopyEz(
                     src,
                     tgt,
-                    (a, b, c, d) =>
+                    (total, transferred, streamSize, reason) =>
                     {
-                        Console.Write(
-                            "\r{0} {1} {2}",
-                            $"{(100f * b / (float)a):f2}%".PadRight(10, ' '),
-                            $"{(a / 1000f):f2} kB".PadRight(25, ' '),
-                            path
-                        );
+                        PrintProgress(total, transferred, path);
                         return FileCopyHelper.CopyProgressResult.PROGRESS_CONTINUE;
                     }
                 );
@@ -196,38 +176,30 @@ internal class Program
 
         if (needsUpdate)
         {
-            Log.Verbose("COPY: {path}", cfg.ManifestFileRel);
+            ////Console.WriteLine("COPY: {0}", cfg.ManifestFileRel);
             File.Copy(cfg.ManifestFileFullPathSource, cfg.ManifestFileFullPathTarget, true);
-            Console.WriteLine(">> {0}", cfg.ManifestFileRel);
+            var fi = new FileInfo(cfg.ManifestFileFullPathSource);
+            PrintProgress(fi.Length, fi.Length, fi.FullName);
+            Console.WriteLine();
         }
 
-        Console.WriteLine("Copied a total of       {0:f2} kB", copiedBytes / 1000d);
-        Console.WriteLine("Did not copy a total of {0:f2} kB", unCopiedBytes / 1000d);
-        Console.WriteLine("Duration:               {0}", sw.Elapsed);
-        Console.WriteLine("Started at              {0}", startTime.ToString());
-        Console.WriteLine("Ended at                {0}", DateTimeOffset.Now.ToString());
+        Console.WriteLine("Copied a total of:        {0:f2} kB", copiedBytes / 1000d);
+        Console.WriteLine("Did not copy a total of:  {0:f2} kB", unCopiedBytes / 1000d);
+        Console.WriteLine("Duration:                 {0}", sw.Elapsed);
+        Console.WriteLine("Started at:               {0}", startTime.ToString());
+        Console.WriteLine("Ended at:                 {0}", DateTimeOffset.Now.ToString());
         Console.WriteLine("Normal exit (0)");
         return 0;
     }
 
-    private static void SetVerbosity(ProgramCfg cfg)
+    private static void PrintProgress(long total, long transferred, string path)
     {
-        if (cfg.Verbosity == 0)
-        {
-            AppLoggingLevelSwitch.MinimumLevel = LogEventLevel.Fatal;
-        }
-        else if (cfg.Verbosity == 1)
-        {
-            AppLoggingLevelSwitch.MinimumLevel = LogEventLevel.Information;
-        }
-        else if (cfg.Verbosity == 2)
-        {
-            AppLoggingLevelSwitch.MinimumLevel = LogEventLevel.Debug;
-        }
-        else if (cfg.Verbosity >= 3)
-        {
-            AppLoggingLevelSwitch.MinimumLevel = LogEventLevel.Verbose;
-        }
+        Console.Write(
+            "\r{0} {1} {2}",
+            $"{(100f * transferred / (float)total):f2}%".PadRight(10, ' '),
+            $"{(total / 1000f):f2} kB".PadRight(20, ' '),
+            path
+        );
     }
 
     private static Dictionary<string, string> ReadManifest(string targetManifest)
