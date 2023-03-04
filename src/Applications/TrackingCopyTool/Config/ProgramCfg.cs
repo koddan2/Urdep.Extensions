@@ -154,6 +154,8 @@ internal class ProgramCfg
 
     public int Verbosity => Optional.Int(_c, "Verbosity", 0);
 
+    public string PathHashSeparator => Optional.String(_c, "PathHashSeparator", " ¤¤ ");
+
     public string ManifestFile => Optional.String(_c, "ManifestFile", "manifest.txt");
     public string ManifestFileRel =>
         Path.GetRelativePath(SourceDirectoryFullPath, ManifestFileFullPathSource);

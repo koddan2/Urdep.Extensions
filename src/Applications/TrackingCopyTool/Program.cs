@@ -121,7 +121,7 @@ internal class Program
         Dictionary<string, string>? targetHashes = null;
         if (File.Exists(cfg.ManifestFileFullPathTarget))
         {
-            targetHashes = ReadManifest(cfg.ManifestFileFullPathTarget);
+            targetHashes = ReadManifest(cfg.ManifestFileFullPathTarget, cfg);
         }
 
         var matchesRelPaths = sourceMatches.Select(x => Path.GetRelativePath(sourceDir, x));
@@ -202,12 +202,12 @@ internal class Program
         );
     }
 
-    private static Dictionary<string, string> ReadManifest(string targetManifest)
+    private static Dictionary<string, string> ReadManifest(string targetManifest, ProgramCfg cfg)
     {
         var lines = File.ReadAllLines(targetManifest);
         return lines
             .Where(x => !string.IsNullOrEmpty(x))
-            .Select(x => x.Split(new[] { " :: " }, StringSplitOptions.TrimEntries))
+            .Select(x => x.Split(new[] { cfg.PathHashSeparator }, StringSplitOptions.TrimEntries))
             .ToDictionary(arr => arr[0], arr => arr[1]);
     }
 
@@ -223,7 +223,7 @@ internal class Program
         using var sw = new StreamWriter(stream);
         foreach (var kvp in hashes)
         {
-            sw.WriteLine("{0} :: {1}", kvp.Key, kvp.Value);
+            sw.WriteLine("{0}{1}{2}", kvp.Key, cfg.PathHashSeparator, kvp.Value);
         }
     }
 
