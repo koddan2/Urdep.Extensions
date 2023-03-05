@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileSystemGlobbing;
 using System.Diagnostics;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using TrackingCopyTool.Config;
 using TrackingCopyTool.Utility;
-using Urdep.Extensions.FileSystem;
 
 namespace TrackingCopyTool;
 
@@ -98,12 +96,12 @@ internal class Program
         }
 
         Console.WriteLine("Source: {0}", cfg.SourceDirectoryFullPath);
-        if (!cfg.OnlyGenerateManifest)
+        if (!cfg.OnlyGenerateManifest && !cfg.OnlyValidateFiles)
         {
             Console.WriteLine("Target: {0}", cfg.Target.FullPath());
         }
 
-        if (!cfg.OnlyGenerateManifest && (cfg.Target.Create || cfg.Force))
+        if (!cfg.OnlyGenerateManifest && !cfg.OnlyValidateFiles && (cfg.Target.Create || cfg.Force))
         {
             var path = cfg.Target.FullPath();
             Dir.Ensure(path);
@@ -122,6 +120,43 @@ internal class Program
         Dir.Ensure(cfg.PrivateDirFullPathSource);
 
         var hashes = ComputeManifest(sourceDir, sourceMatches, hashAlgo);
+        if (cfg.OnlyValidateFiles)
+        {
+            var readManifest = ReadManifest(cfg.ManifestFileFullPathSource, cfg);
+            List<string> errors = new();
+            foreach (var item in hashes)
+            {
+                if (readManifest.TryGetValue(item.Key, out string? value))
+                {
+                    var ok = value == item.Value;
+                    if (cfg.Verbosity > 2)
+                    {
+                        Console.WriteLine("Hash {0} ({1})", ok ? "OK" : "Bad", item.Key);
+                    }
+                }
+                else
+                {
+                    errors.Add(string.Format("Path {0} was not found in manifest", item.Key));
+                }
+            }
+
+            Console.WriteLine("CMD: {0}", Environment.CommandLine);
+            if (errors.Any())
+            {
+                foreach (var error in errors)
+                {
+                    Console.WriteLine("ERR: {0}", error);
+                }
+                return 1;
+            }
+            else
+            {
+                Console.WriteLine("Validation OK, manifest: {0}", cfg.ManifestFileFullPathSource);
+            }
+
+            return 0;
+        }
+
         WriteManifest(cfg, hashes);
 
         if (cfg.OnlyGenerateManifest)

@@ -23,6 +23,10 @@
         "TrackingCopyTool V": {
             "commandName": "Project",
             "commandLineArgs": "-d C:/temp/tgt -g -v 3"
+        },
+        "TrackingCopyTool VI": {
+            "commandName": "Project",
+            "commandLineArgs": "-d C:/temp/tgt --OnlyValidateFiles y -v 3"
         }
     }
 }

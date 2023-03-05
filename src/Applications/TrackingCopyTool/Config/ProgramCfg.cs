@@ -167,6 +167,8 @@ internal class ProgramCfg
         || _args.IsDefined("-g")
         || _args.IsDefined("--onlyGenerateManifest");
 
+    public bool OnlyValidateFiles => Optional.Bool(_c, "OnlyValidateFiles");
+
     public bool DisregardRestartManifest =>
         Optional.Bool(_c, "DisregardRestartManifest")
         || _args.IsDefined("-p")
