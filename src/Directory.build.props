@@ -1,0 +1,8 @@
+<Project>
+    <PropertyGroup>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <Authors>koddan2@outlook.com</Authors>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/koddan2/Urdep.Extensions</PackageProjectUrl>
+    </PropertyGroup>
+</Project>

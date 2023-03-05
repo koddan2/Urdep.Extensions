@@ -1,0 +1,5 @@
+<Project>
+    <ItemGroup Condition="'$(Configuration)' == 'Release'">
+        <Compile Remove="Test/*" />
+    </ItemGroup>
+</Project>
