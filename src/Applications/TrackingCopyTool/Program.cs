@@ -1,6 +1,6 @@
-﻿using K4os.Hash.xxHash;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileSystemGlobbing;
+using System.Data.HashFunction.xxHash;
 using System.Diagnostics;
 using System.Globalization;
 using System.Security.Cryptography;
@@ -329,7 +329,7 @@ internal class Program
         return lines
             .Select(x => x.Split(new[] { cfg.PathHashSeparator }, StringSplitOptions.TrimEntries))
             .Where(x => x.Length == 2)
-            .Select(x=>new Pair(x[0], x[1]))
+            .Select(x => new Pair(x[0], x[1]))
             .ToHashSet()
             .ToDictionary(x => x.Path, x => x.Hash);
     }
@@ -385,6 +385,9 @@ internal class Program
         return hashes;
     }
 
+
+    public static readonly IxxHashConfig _xxHashConfig = new xxHashConfig { HashSizeInBits = 64 };
+    public static readonly IxxHash _xxHash = xxHashFactory.Instance.Create(_xxHashConfig);
     internal static Dictionary<string, string> ComputeManifestXXH(
         string baseDir,
         IEnumerable<string> paths
@@ -394,10 +397,10 @@ internal class Program
         foreach (var path in paths)
         {
             var relPath = Path.GetRelativePath(baseDir, path);
-            var hashVal = XXH64.DigestOf(File.ReadAllBytes(path));
-            ////var hashBytes = BitConverter.GetBytes(hashVal);
-            ////hashes[relPath] = Convert.ToBase64String(hashBytes);
-            hashes[relPath] = hashVal.ToString(CultureInfo.InvariantCulture);
+            using var stream = File.OpenRead(path);
+            var hashVal = _xxHash.ComputeHash(stream);
+            var ul = BitConverter.ToUInt64(hashVal.Hash);
+            hashes[relPath] = ul.ToString(CultureInfo.InvariantCulture);
         }
 
         return hashes;
