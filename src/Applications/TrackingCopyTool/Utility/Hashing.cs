@@ -2,8 +2,16 @@
 
 namespace TrackingCopyTool.Utility;
 
-public static class Hashing
+/// <summary>
+/// Helper class for hashing operations.
+/// </summary>
+internal static class Hashing
 {
+    /// <summary>
+    /// Gets an instance of a specific hash algo.
+    /// </summary>
+    /// <param name="algo">The algo to instatiate.</param>
+    /// <returns>The instance.</returns>
     public static HashAlgorithm GetHashAlgorithmInstance(HashAlgo algo)
     {
         return algo switch

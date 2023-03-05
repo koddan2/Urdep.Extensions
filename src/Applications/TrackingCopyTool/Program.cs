@@ -155,7 +155,7 @@ internal class Program
                 {
                     Console.WriteLine("ERR: {0}", error);
                 }
-                return 1;
+                return 2;
             }
             else
             {

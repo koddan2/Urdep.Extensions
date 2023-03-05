@@ -135,6 +135,11 @@ internal class ProgramCfg
         _args = new Args(args);
     }
 
+    /// <summary>
+    /// The consumes the supplied includes or returns the default ones.
+    /// </summary>
+    /// <param name="values">The supplied values.</param>
+    /// <returns>The supplied values or the default ones, if none are supplied.</returns>
     ICollection<string> DefaultIncludesTransform(ICollection<string> values)
     {
         if (values.Any())
@@ -144,66 +149,157 @@ internal class ProgramCfg
         return new[] { "**/*.*" };
     }
 
+    /// <summary>
+    /// The name of the tool's private directory
+    /// </summary>
     public static readonly string PrivateDirectoryName = ".TrackingCopyTool";
-    public static string PrivateDir => PrivateDirectoryName;
-    public string PrivateDirFullPathSource => Path.Combine(SourceDirectoryFullPath, PrivateDir);
-    public string PrivateDirFullPathTarget => Path.Combine(Target.FullPath(), PrivateDir);
 
+    /// <summary>
+    /// Full path to the tool's private directory relative to the source directory.
+    /// </summary>
+    public string PrivateDirFullPathSource => Path.Combine(SourceDirectoryFullPath, PrivateDirectoryName);
+
+    /// <summary>
+    /// Full path to the tool's private directory relative to the target directory.
+    /// </summary>
+    public string PrivateDirFullPathTarget => Path.Combine(Target.FullPath(), PrivateDirectoryName);
+
+    /// <summary>
+    /// The transformer which makes sure the the tool's private directory is not included
+    /// during normal operation.
+    /// </summary>
+    /// <param name="values">The supplied values.</param>
+    /// <returns>The new values which excludes the tool's private directory.</returns>
     ICollection<string> DefaultExcludesTransform(ICollection<string> values)
     {
-        return Enumerable.Concat(values, new[] { Path.Combine(PrivateDir, "**") }).ToList();
+        return Enumerable.Concat(values, new[] { Path.Combine(PrivateDirectoryName, "**") }).ToList();
     }
 
+    /// <summary>
+    /// The source directory, as given by the --Directory or -d argument.
+    /// </summary>
     public string Directory => Required.Directory(_c, "Directory", true);
 
+    /// <summary>
+    /// Full path to the source directory.
+    /// </summary>
     public string SourceDirectoryFullPath =>
         Path.GetFullPath(Directory)
         ?? throw new ApplicationException($"Failed getting full path to directory: {Directory}");
 
+    /// <summary>
+    /// The computed, actual resulting Includes, as given by the argument --Includes (or default,
+    /// which is **/*.*
+    /// </summary>
     public ICollection<string> Includes => Optional.Csv(_c, "Includes", DefaultIncludesTransform);
+
+    /// <summary>
+    /// The computed, actual resulting Excludes, as given by the argument --Excludes, plus an
+    /// exlude for the tool's private directory.
+    /// </summary>
     public ICollection<string> Excludes => Optional.Csv(_c, "Excludes", DefaultExcludesTransform);
 
+    /// <summary>
+    /// This argument tells the tool to force create nodes on the target.
+    /// </summary>
     public bool Force =>
         Optional.Bool(_c, "Force");
+
+    /// <summary>
+    /// This argument tells the tool to only generate the manifest file. Useful if the tool
+    /// can be installed on the target machine and pre-generate the manifest, so that when
+    /// copy operations should start, there is a ready-to-use manifest.
+    /// </summary>
     public bool OnlyGenerateManifest =>
         Optional.Bool(_c, "OnlyGenerateManifest");
 
+    /// <summary>
+    /// Tells the tool to only validate the files, given the contents of the existing manifest.
+    /// </summary>
     public bool OnlyValidateFiles => Optional.Bool(_c, "OnlyValidateFiles");
 
+    /// <summary>
+    /// Tells the tool to not keep track of copied files during operation. Disabling this means
+    /// that the tool cannot resume a run if it is interrupted (i.e. must start from the beginning).
+    /// </summary>
     public bool DisregardRestartManifest =>
         Optional.Bool(_c, "DisregardRestartManifest");
 
+    /// <summary>
+    /// This argument controls how much output the tool prints.
+    /// 0 = minimal output.
+    /// 1 = warnings
+    /// 2 = informational
+    /// 3 = debug/trace
+    /// </summary>
     public int Verbosity => Optional.Int(_c, "Verbosity", 0);
 
+    /// <summary>
+    /// The separator used in the manifest to delimit the path and the hash.
+    /// </summary>
     public string PathHashSeparator => Optional.String(_c, "PathHashSeparator", " ¤¤ ");
 
+    /// <summary>
+    /// The name of the manifest file.
+    /// </summary>
     public string ManifestFile => Optional.String(_c, "ManifestFile", "manifest.txt");
+
+    /// <summary>
+    /// The relative path to the manifest file, with respect to the source directory.
+    /// </summary>
     public string ManifestFileRel =>
         Path.GetRelativePath(SourceDirectoryFullPath, ManifestFileFullPathSource);
+
+    /// <summary>
+    /// The full path to the manifest file relative to the source directory.
+    /// </summary>
     public string ManifestFileFullPathSource =>
         Path.Combine(PrivateDirFullPathSource, ManifestFile);
+
+    /// <summary>
+    /// The full path to the manifest file relative to the target directory.
+    /// </summary>
     public string ManifestFileFullPathTarget =>
         Path.Combine(PrivateDirFullPathTarget, ManifestFile);
 
+    /// <summary>
+    /// The full path to the restart manifest file relative to the target directory.
+    /// </summary>
     public string RestartManifestFileFullPathTarget =>
         FilenameExtensions.GetTransformedFileNameKeepParentPath(
             ManifestFileFullPathTarget,
             n => $"{n}-restart"
         );
 
+    /// <summary>
+    /// The target element, which is the name of the target, and whether to create the directory node, if not exists.
+    /// </summary>
     public TargetElement Target =>
         new(Required.Directory(_c, "Target:Name", false))
         {
             Create = Optional.Bool(_c, "Target:Create"),
         };
 
+    /// <summary>
+    /// The debug element is used for debugging purposes.
+    /// </summary>
     public DebugElement Debug =>
         new() { SlowerFileTransfers = Optional.Int(_c, "Debug:SlowerFileTransfers", null), };
 
+    /// <summary>
+    /// If truish, will use xxHash for hashing file contents.
+    /// </summary>
     public bool UseXXH => Optional.Bool(_c, "UseXXH");
 }
 
-public record DebugElement
+/// <summary>
+/// Model for debug configuration.
+/// </summary>
+internal record DebugElement
 {
+    /// <summary>
+    /// Slows down file transfers by sleeping the thread (in ms) for each callback from
+    /// the underlying copy subroutine.
+    /// </summary>
     public int? SlowerFileTransfers { get; init; }
 }

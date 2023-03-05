@@ -22,7 +22,7 @@
         },
         "TrackingCopyTool V": {
             "commandName": "Project",
-            "commandLineArgs": "-d C:/temp/tgt -g -v 3"
+            "commandLineArgs": "-d C:/temp/src -v 3 --usexxh yes --target:name c:/temp/tgt"
         },
         "TrackingCopyTool VI": {
             "commandName": "Project",

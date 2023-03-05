@@ -1,0 +1,190 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TrackingCopyTool</name>
+    </assembly>
+    <members>
+        <member name="M:TrackingCopyTool.Config.ProgramCfg.DefaultIncludesTransform(System.Collections.Generic.ICollection{System.String})">
+            <summary>
+            The consumes the supplied includes or returns the default ones.
+            </summary>
+            <param name="values">The supplied values.</param>
+            <returns>The supplied values or the default ones, if none are supplied.</returns>
+        </member>
+        <member name="F:TrackingCopyTool.Config.ProgramCfg.PrivateDirectoryName">
+            <summary>
+            The name of the tool's private directory
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.PrivateDirFullPathSource">
+            <summary>
+            Full path to the tool's private directory relative to the source directory.
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.PrivateDirFullPathTarget">
+            <summary>
+            Full path to the tool's private directory relative to the target directory.
+            </summary>
+        </member>
+        <member name="M:TrackingCopyTool.Config.ProgramCfg.DefaultExcludesTransform(System.Collections.Generic.ICollection{System.String})">
+            <summary>
+            The transformer which makes sure the the tool's private directory is not included
+            during normal operation.
+            </summary>
+            <param name="values">The supplied values.</param>
+            <returns>The new values which excludes the tool's private directory.</returns>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.Directory">
+            <summary>
+            The source directory, as given by the --Directory or -d argument.
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.SourceDirectoryFullPath">
+            <summary>
+            Full path to the source directory.
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.Includes">
+            <summary>
+            The computed, actual resulting Includes, as given by the argument --Includes (or default,
+            which is **/*.*
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.Excludes">
+            <summary>
+            The computed, actual resulting Excludes, as given by the argument --Excludes, plus an
+            exlude for the tool's private directory.
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.Force">
+            <summary>
+            This argument tells the tool to force create nodes on the target.
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.OnlyGenerateManifest">
+            <summary>
+            This argument tells the tool to only generate the manifest file. Useful if the tool
+            can be installed on the target machine and pre-generate the manifest, so that when
+            copy operations should start, there is a ready-to-use manifest.
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.OnlyValidateFiles">
+            <summary>
+            Tells the tool to only validate the files, given the contents of the existing manifest.
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.DisregardRestartManifest">
+            <summary>
+            Tells the tool to not keep track of copied files during operation. Disabling this means
+            that the tool cannot resume a run if it is interrupted (i.e. must start from the beginning).
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.Verbosity">
+            <summary>
+            This argument controls how much output the tool prints.
+            0 = minimal output.
+            1 = warnings
+            2 = informational
+            3 = debug/trace
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.PathHashSeparator">
+            <summary>
+            The separator used in the manifest to delimit the path and the hash.
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.ManifestFile">
+            <summary>
+            The name of the manifest file.
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.ManifestFileRel">
+            <summary>
+            The relative path to the manifest file, with respect to the source directory.
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.ManifestFileFullPathSource">
+            <summary>
+            The full path to the manifest file relative to the source directory.
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.ManifestFileFullPathTarget">
+            <summary>
+            The full path to the manifest file relative to the target directory.
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.RestartManifestFileFullPathTarget">
+            <summary>
+            The full path to the restart manifest file relative to the target directory.
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.Target">
+            <summary>
+            The target element, which is the name of the target, and whether to create the directory node, if not exists.
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.Debug">
+            <summary>
+            The debug element is used for debugging purposes.
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.ProgramCfg.UseXXH">
+            <summary>
+            If truish, will use xxHash for hashing file contents.
+            </summary>
+        </member>
+        <member name="T:TrackingCopyTool.Config.DebugElement">
+            <summary>
+            Model for debug configuration.
+            </summary>
+        </member>
+        <member name="P:TrackingCopyTool.Config.DebugElement.SlowerFileTransfers">
+            <summary>
+            Slows down file transfers by sleeping the thread (in ms) for each callback from
+            the underlying copy subroutine.
+            </summary>
+        </member>
+        <member name="T:TrackingCopyTool.Utility.HashAlgo">
+            <summary>
+            An enum of built-in hash algorithms.
+            </summary>
+        </member>
+        <member name="F:TrackingCopyTool.Utility.HashAlgo.MD5">
+            <summary>
+            MD5
+            </summary>
+        </member>
+        <member name="F:TrackingCopyTool.Utility.HashAlgo.SHA1">
+            <summary>
+            SHA1
+            </summary>
+        </member>
+        <member name="F:TrackingCopyTool.Utility.HashAlgo.SHA256">
+            <summary>
+            SHA256
+            </summary>
+        </member>
+        <member name="F:TrackingCopyTool.Utility.HashAlgo.SHA384">
+            <summary>
+            SHA384
+            </summary>
+        </member>
+        <member name="F:TrackingCopyTool.Utility.HashAlgo.SHA512">
+            <summary>
+            SHA512
+            </summary>
+        </member>
+        <member name="T:TrackingCopyTool.Utility.Hashing">
+            <summary>
+            Helper class for hashing operations.
+            </summary>
+        </member>
+        <member name="M:TrackingCopyTool.Utility.Hashing.GetHashAlgorithmInstance(TrackingCopyTool.Utility.HashAlgo)">
+            <summary>
+            Gets an instance of a specific hash algo.
+            </summary>
+            <param name="algo">The algo to instatiate.</param>
+            <returns>The instance.</returns>
+        </member>
+    </members>
+</doc>
