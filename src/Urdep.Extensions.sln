@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Align", "Applications\Align
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrackingCopyTool", "Applications\TrackingCopyTool\TrackingCopyTool.csproj", "{FEDD7402-E5A0-4752-9ECD-709644D28600}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Urdep.Extensions.FileSystem", "Urdep.Extensions.FileSystem\Urdep.Extensions.FileSystem.csproj", "{AD63B600-09CA-43C8-9BB5-79C0D9175AED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{FEDD7402-E5A0-4752-9ECD-709644D28600}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEDD7402-E5A0-4752-9ECD-709644D28600}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEDD7402-E5A0-4752-9ECD-709644D28600}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD63B600-09CA-43C8-9BB5-79C0D9175AED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD63B600-09CA-43C8-9BB5-79C0D9175AED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD63B600-09CA-43C8-9BB5-79C0D9175AED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD63B600-09CA-43C8-9BB5-79C0D9175AED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

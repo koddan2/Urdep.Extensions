@@ -19,6 +19,10 @@
         "TrackingCopyTool IV": {
             "commandName": "Project",
             "commandLineArgs": "-d C:\\CODE\\.local-nuget-staging\\ -g -v 3"
+        },
+        "TrackingCopyTool V": {
+            "commandName": "Project",
+            "commandLineArgs": "-d C:/temp/tgt -g -v 3"
         }
     }
 }

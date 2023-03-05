@@ -24,6 +24,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\Urdep.Extensions.FileSystem\Urdep.Extensions.FileSystem.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
         <None Update="Install.ps1">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>

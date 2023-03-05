@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
+using Urdep.Extensions.FileSystem;
 
 namespace TrackingCopyTool.Config;
 
@@ -45,15 +46,10 @@ internal static class Optional
 
     public static bool Bool(
         IConfiguration conf,
-        string key,
-        string[]? args = null,
-        string? shortName = null,
-        bool? isFlag = null
+        string key
     )
     {
-        var flagDef =
-            isFlag is true && args?.Any(x => x.ToUpper() == $"--{key}" || x == shortName) is true;
-        return Values.Truish(conf[key]) || flagDef;
+        return Values.Truish(conf[key]);
     }
 
     public static string String(IConfiguration conf, string key, string? defaultValue = null)
@@ -109,15 +105,31 @@ internal static class Required
     }
 }
 
+internal record Args(string[] Arguments);
+
+internal static class ArgsExt
+{
+    public static bool IsDefined(this Args args, string a)
+    {
+        var upper = a.ToUpper();
+        for (int i = 0; i < args.Arguments.Length; i++)
+        {
+            if (args.Arguments[i].ToUpper() == upper)
+                return true;
+        }
+        return false;
+    }
+}
+
 internal class ProgramCfg
 {
     private readonly IConfiguration _c;
-    private readonly string[] _args;
+    private readonly Args _args;
 
     public ProgramCfg(IConfiguration c, string[] args)
     {
         _c = c;
-        _args = args;
+        _args = new Args(args);
     }
 
     ICollection<string> DefaultIncludesTransform(ICollection<string> values)
@@ -148,9 +160,17 @@ internal class ProgramCfg
     public ICollection<string> Includes => Optional.Csv(_c, "Includes", DefaultIncludesTransform);
     public ICollection<string> Excludes => Optional.Csv(_c, "Excludes", DefaultExcludesTransform);
 
-    public bool Force => Optional.Bool(_c, "Force", _args, "-f", isFlag: true);
+    public bool Force =>
+        Optional.Bool(_c, "Force") || _args.IsDefined("-f") || _args.IsDefined("--force");
     public bool OnlyGenerateManifest =>
-        Optional.Bool(_c, "OnlyGenerateManifest", _args, "-g", isFlag: true);
+        Optional.Bool(_c, "OnlyGenerateManifest")
+        || _args.IsDefined("-g")
+        || _args.IsDefined("--onlyGenerateManifest");
+
+    public bool DisregardRestartManifest =>
+        Optional.Bool(_c, "DisregardRestartManifest")
+        || _args.IsDefined("-p")
+        || _args.IsDefined("--DisregardRestartManifest");
 
     public int Verbosity => Optional.Int(_c, "Verbosity", 0);
 
@@ -163,6 +183,10 @@ internal class ProgramCfg
         Path.Combine(PrivateDirFullPathSource, ManifestFile);
     public string ManifestFileFullPathTarget =>
         Path.Combine(PrivateDirFullPathTarget, ManifestFile);
+
+    public string RestartManifestFileFullPathTarget => FilenameExtensions
+        .GetTransformedFileNameKeepParentPath(ManifestFileFullPathTarget, n => $"{n}-restart");
+
     public TargetElement Target =>
         new(Required.Directory(_c, "Target:Name", false))
         {

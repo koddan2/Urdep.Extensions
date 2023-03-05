@@ -82,6 +82,9 @@
         "type": "Transitive",
         "resolved": "7.0.0",
         "contentHash": "um1KU5kxcRp3CNuI8o/GrZtD4AIOXDk+RLsytjZ9QPok3ttLUelLKpilVPuaFT3TFjOhSibUAso0odbOaCDj3Q=="
+      },
+      "urdep.extensions.filesystem": {
+        "type": "Project"
       }
     },
     "net7.0/win-x64": {}
