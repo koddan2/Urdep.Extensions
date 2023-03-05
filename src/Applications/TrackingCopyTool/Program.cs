@@ -26,6 +26,8 @@ internal class Program
             ["-g"] = "OnlyGenerateManifest",
         };
 
+    private static ProgramCfg? _Cfg;
+
     private static int Main(string[] args)
     {
         try
@@ -62,9 +64,10 @@ internal class Program
         catch (Exception exn)
         {
             Console.WriteLine("ERR: {0}", exn.Message);
-#if DEBUG
-            Console.WriteLine(exn.StackTrace);
-#endif
+            if (_Cfg is null || _Cfg.Verbosity > 2)
+            {
+                Console.WriteLine(exn.StackTrace);
+            }
             return 1;
         }
         ////finally
@@ -87,9 +90,12 @@ internal class Program
             .Build();
 
         var cfg = new ProgramCfg(config, args);
-#if DEBUG
-        Console.WriteLine(config.GetDebugView());
-#endif
+        _Cfg = cfg;
+
+        if (cfg.Verbosity > 2)
+        {
+            Console.WriteLine(config.GetDebugView());
+        }
 
         Console.WriteLine("Source: {0}", cfg.SourceDirectoryFullPath);
         if (!cfg.OnlyGenerateManifest)
@@ -135,17 +141,16 @@ internal class Program
         }
         if (!cfg.DisregardRestartManifest && !cfg.Force && File.Exists(cfg.RestartManifestFileFullPathTarget))
         {
-            if (targetHashes is null)
-            {
-                targetHashes = new Dictionary<string, string>();
-            }
+            targetHashes ??= new Dictionary<string, string>();
 
             var extraHashes = ReadManifest(cfg.RestartManifestFileFullPathTarget, cfg);
             foreach (var kvp in extraHashes)
             {
-#if DEBUG
-                Console.WriteLine("Found hash in restart manifest: {0}={1}", kvp.Key, kvp.Value);
-#endif
+                if (cfg.Verbosity > 2)
+                {
+                    Console.WriteLine("Found hash in restart manifest: {0}={1}", kvp.Key, kvp.Value);
+                }
+
                 if (!targetHashes.ContainsKey(kvp.Key))
                 {
                     targetHashes[kvp.Key] = kvp.Value;
@@ -194,22 +199,23 @@ internal class Program
                     (total, transferred, streamSize, reason) =>
                     {
                         PrintProgress(total, transferred, path);
-#if DEBUG
-                        Thread.Sleep(200);
-#endif
+
+                        if (cfg.Debug.SlowerFileTransfers is int slower)
+                        {
+                            Thread.Sleep(slower);
+                        }
+
                         return FileCopyHelper.CopyProgressResult.PROGRESS_CONTINUE;
                     }
                 );
                 Console.WriteLine();
                 AppendToRestartManifest(cfg, path, hashes[path]);
-                ////Log.Debug("CP ✓: {path}", path);
                 copiedBytes += new FileInfo(src).Length;
             }
         }
 
         if (needsUpdate)
         {
-            ////Console.WriteLine("COPY: {0}", cfg.ManifestFileRel);
             File.Copy(cfg.ManifestFileFullPathSource, cfg.ManifestFileFullPathTarget, true);
             var fi = new FileInfo(cfg.ManifestFileFullPathSource);
             PrintProgress(fi.Length, fi.Length, fi.FullName);
@@ -219,6 +225,10 @@ internal class Program
         // clean up: delete restart manifest.
         if (File.Exists(cfg.RestartManifestFileFullPathTarget))
         {
+            if (cfg.Verbosity > 2)
+            {
+                Console.WriteLine("Deleting {0}", cfg.RestartManifestFileFullPathTarget);
+            }
             File.Delete(cfg.RestartManifestFileFullPathTarget);
         }
 
@@ -289,6 +299,10 @@ internal class Program
     {
         using var sw = new StreamWriter(cfg.RestartManifestFileFullPathTarget, true);
         sw.WriteLine("{0}{1}{2}", path, cfg.PathHashSeparator, hash);
+        if (cfg.Verbosity > 2)
+        {
+            Console.WriteLine("Appended({3}): {0}{1}{2}", path, cfg.PathHashSeparator, hash, cfg.RestartManifestFileFullPathTarget);
+        }
     }
 
     internal static Dictionary<string, string> ComputeManifest(

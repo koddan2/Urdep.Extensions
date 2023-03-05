@@ -192,4 +192,14 @@ internal class ProgramCfg
         {
             Create = Optional.Bool(_c, "Target:Create"),
         };
+
+    public DebugElement Debug => new DebugElement
+    {
+        SlowerFileTransfers = Optional.Int(_c, "Debug:SlowerFileTransfers", null),
+    };
+}
+
+public record DebugElement
+{
+    public int? SlowerFileTransfers { get; init; }
 }
