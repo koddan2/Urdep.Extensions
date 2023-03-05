@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System.Diagnostics;
 using Urdep.Extensions.FileSystem;
 
 namespace TrackingCopyTool.Config;
@@ -20,7 +19,12 @@ internal static class Values
         if (v is string s)
         {
             var upper = s.ToUpper();
-            return upper == "TRUE" || upper == "Y" || upper == "YES" || upper == "1";
+            return upper == "TRUE"
+                || upper == "Y"
+                || upper == "YES"
+                || upper == "1"
+                || upper == "YE"
+                || upper == "YEP";
         }
         return false;
     }
@@ -44,10 +48,7 @@ internal static class Optional
         return transformer(result);
     }
 
-    public static bool Bool(
-        IConfiguration conf,
-        string key
-    )
+    public static bool Bool(IConfiguration conf, string key)
     {
         return Values.Truish(conf[key]);
     }
@@ -115,7 +116,9 @@ internal static class ArgsExt
         for (int i = 0; i < args.Arguments.Length; i++)
         {
             if (args.Arguments[i].ToUpper() == upper)
+            {
                 return true;
+            }
         }
         return false;
     }
@@ -142,7 +145,7 @@ internal class ProgramCfg
     }
 
     public static readonly string PrivateDirectoryName = ".TrackingCopyTool";
-    public string PrivateDir => PrivateDirectoryName;
+    public static string PrivateDir => PrivateDirectoryName;
     public string PrivateDirFullPathSource => Path.Combine(SourceDirectoryFullPath, PrivateDir);
     public string PrivateDirFullPathTarget => Path.Combine(Target.FullPath(), PrivateDir);
 
@@ -161,18 +164,14 @@ internal class ProgramCfg
     public ICollection<string> Excludes => Optional.Csv(_c, "Excludes", DefaultExcludesTransform);
 
     public bool Force =>
-        Optional.Bool(_c, "Force") || _args.IsDefined("-f") || _args.IsDefined("--force");
+        Optional.Bool(_c, "Force");
     public bool OnlyGenerateManifest =>
-        Optional.Bool(_c, "OnlyGenerateManifest")
-        || _args.IsDefined("-g")
-        || _args.IsDefined("--onlyGenerateManifest");
+        Optional.Bool(_c, "OnlyGenerateManifest");
 
     public bool OnlyValidateFiles => Optional.Bool(_c, "OnlyValidateFiles");
 
     public bool DisregardRestartManifest =>
-        Optional.Bool(_c, "DisregardRestartManifest")
-        || _args.IsDefined("-p")
-        || _args.IsDefined("--DisregardRestartManifest");
+        Optional.Bool(_c, "DisregardRestartManifest");
 
     public int Verbosity => Optional.Int(_c, "Verbosity", 0);
 
@@ -186,8 +185,11 @@ internal class ProgramCfg
     public string ManifestFileFullPathTarget =>
         Path.Combine(PrivateDirFullPathTarget, ManifestFile);
 
-    public string RestartManifestFileFullPathTarget => FilenameExtensions
-        .GetTransformedFileNameKeepParentPath(ManifestFileFullPathTarget, n => $"{n}-restart");
+    public string RestartManifestFileFullPathTarget =>
+        FilenameExtensions.GetTransformedFileNameKeepParentPath(
+            ManifestFileFullPathTarget,
+            n => $"{n}-restart"
+        );
 
     public TargetElement Target =>
         new(Required.Directory(_c, "Target:Name", false))
@@ -195,10 +197,10 @@ internal class ProgramCfg
             Create = Optional.Bool(_c, "Target:Create"),
         };
 
-    public DebugElement Debug => new DebugElement
-    {
-        SlowerFileTransfers = Optional.Int(_c, "Debug:SlowerFileTransfers", null),
-    };
+    public DebugElement Debug =>
+        new() { SlowerFileTransfers = Optional.Int(_c, "Debug:SlowerFileTransfers", null), };
+
+    public bool UseXXH => Optional.Bool(_c, "UseXXH");
 }
 
 public record DebugElement

@@ -2,6 +2,12 @@
   "version": 1,
   "dependencies": {
     "net7.0": {
+      "K4os.Hash.xxHash": {
+        "type": "Direct",
+        "requested": "[1.0.8, )",
+        "resolved": "1.0.8",
+        "contentHash": "Wp2F7BamQ2Q/7Hk834nV9vRQapgcr8kgv9Jvfm8J3D0IhDqZMMl+a2yxUq5ltJitvXvQfB8W6K4F4fCbw/P6YQ=="
+      },
       "Microsoft.Extensions.Configuration": {
         "type": "Direct",
         "requested": "[7.0.0, )",
@@ -86,7 +92,6 @@
       "urdep.extensions.filesystem": {
         "type": "Project"
       }
-    },
-    "net7.0/win-x64": {}
+    }
   }
 }

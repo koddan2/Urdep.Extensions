@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using K4os.Hash.xxHash;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileSystemGlobbing;
 using System.Diagnostics;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using TrackingCopyTool.Config;
@@ -26,17 +28,19 @@ internal class Program
 
     private static ProgramCfg? _Cfg;
 
+    private static string MainModuleFileName =>
+        Process.GetCurrentProcess()?.MainModule?.FileName ?? ".";
+
     private static int Main(string[] args)
     {
         try
         {
             if (args[0] == "install")
             {
-                var cmdline = Environment.GetCommandLineArgs();
-
+                ////var cmdline = Environment.GetCommandLineArgs();
                 var assemblyLoc =
-                    Path.GetDirectoryName(cmdline[0])
-                    ?? Path.GetFullPath(".");
+                    ////Path.GetDirectoryName(cmdline[0])
+                    Path.GetDirectoryName(MainModuleFileName) ?? Directory.GetCurrentDirectory();
 
                 var target = Path.GetFullPath(args[1]);
                 var targetPriv = Path.Combine(target, ProgramCfg.PrivateDirectoryName);
@@ -68,9 +72,6 @@ internal class Program
             }
             return 1;
         }
-        ////finally
-        ////{
-        ////}
     }
 
     private static int InnerMain(string[] args)
@@ -98,7 +99,14 @@ internal class Program
         Console.WriteLine("Source: {0}", cfg.SourceDirectoryFullPath);
         if (!cfg.OnlyGenerateManifest && !cfg.OnlyValidateFiles)
         {
-            Console.WriteLine("Target: {0}", cfg.Target.FullPath());
+            var targetFullPath = cfg.Target.FullPath();
+            Console.WriteLine("Target: {0}", targetFullPath);
+
+            if (cfg.SourceDirectoryFullPath.ToUpperInvariant() == targetFullPath.ToUpperInvariant())
+            {
+                Console.WriteLine("ERR: Invalid invocation: source and target are the same");
+                return 1;
+            }
         }
 
         if (!cfg.OnlyGenerateManifest && !cfg.OnlyValidateFiles && (cfg.Target.Create || cfg.Force))
@@ -119,7 +127,7 @@ internal class Program
 
         Dir.Ensure(cfg.PrivateDirFullPathSource);
 
-        var hashes = ComputeManifest(sourceDir, sourceMatches, hashAlgo);
+        var hashes = cfg.UseXXH ? ComputeManifestXXH(sourceDir, sourceMatches) : ComputeManifest(sourceDir, sourceMatches, hashAlgo);
         if (cfg.OnlyValidateFiles)
         {
             var readManifest = ReadManifest(cfg.ManifestFileFullPathSource, cfg);
@@ -174,7 +182,11 @@ internal class Program
         {
             targetHashes = ReadManifest(cfg.ManifestFileFullPathTarget, cfg);
         }
-        if (!cfg.DisregardRestartManifest && !cfg.Force && File.Exists(cfg.RestartManifestFileFullPathTarget))
+        if (
+            !cfg.DisregardRestartManifest
+            && !cfg.Force
+            && File.Exists(cfg.RestartManifestFileFullPathTarget)
+        )
         {
             targetHashes ??= new Dictionary<string, string>();
 
@@ -183,7 +195,11 @@ internal class Program
             {
                 if (cfg.Verbosity > 2)
                 {
-                    Console.WriteLine("Found hash in restart manifest: {0}={1}", kvp.Key, kvp.Value);
+                    Console.WriteLine(
+                        "Found hash in restart manifest: {0}={1}",
+                        kvp.Key,
+                        kvp.Value
+                    );
                 }
 
                 if (!targetHashes.ContainsKey(kvp.Key))
@@ -288,22 +304,24 @@ internal class Program
 
     private static Dictionary<string, string> ReadManifest(string targetManifest, ProgramCfg cfg)
     {
-        var lines = File.ReadAllLines(targetManifest)
-            .Where(x => !string.IsNullOrEmpty(x))
-            .ToList()
-            ;
+        var lines = File.ReadAllLines(targetManifest).Where(x => !string.IsNullOrEmpty(x)).ToList();
 
         var firstLine = lines.FirstOrDefault();
         if (firstLine is not null)
         {
-            var test = firstLine.Split(new[] { cfg.PathHashSeparator }, StringSplitOptions.TrimEntries);
+            var test = firstLine.Split(
+                new[] { cfg.PathHashSeparator },
+                StringSplitOptions.TrimEntries
+            );
             if (test.Length != 2)
             {
                 Console.WriteLine($"ERR: Manifest {targetManifest} is malformed.");
                 Console.WriteLine($"ERR: Double-check that:");
                 Console.WriteLine($"ERR: - it has the correct format,");
                 Console.WriteLine($"ERR: - it encoded in {Encoding.Default.EncodingName},");
-                Console.WriteLine($"ERR: - and the paths and hashes are separated by '{cfg.PathHashSeparator}'");
+                Console.WriteLine(
+                    $"ERR: - and the paths and hashes are separated by '{cfg.PathHashSeparator}'"
+                );
                 throw new ApplicationException("Could not parse the manifest file.");
             }
         }
@@ -311,8 +329,11 @@ internal class Program
         return lines
             .Select(x => x.Split(new[] { cfg.PathHashSeparator }, StringSplitOptions.TrimEntries))
             .Where(x => x.Length == 2)
-            .ToDictionary(arr => arr[0], arr => arr[1]);
+            .Select(x=>new Pair(x[0], x[1]))
+            .ToHashSet()
+            .ToDictionary(x => x.Path, x => x.Hash);
     }
+    private record Pair(string Path, string Hash);
 
     private static void WriteManifest(ProgramCfg cfg, Dictionary<string, string> hashes)
     {
@@ -336,7 +357,13 @@ internal class Program
         sw.WriteLine("{0}{1}{2}", path, cfg.PathHashSeparator, hash);
         if (cfg.Verbosity > 2)
         {
-            Console.WriteLine("Appended({3}): {0}{1}{2}", path, cfg.PathHashSeparator, hash, cfg.RestartManifestFileFullPathTarget);
+            Console.WriteLine(
+                "Appended({3}): {0}{1}{2}",
+                path,
+                cfg.PathHashSeparator,
+                hash,
+                cfg.RestartManifestFileFullPathTarget
+            );
         }
     }
 
@@ -353,6 +380,24 @@ internal class Program
             using var stream = File.OpenRead(path);
             var hashBytes = hashAlgo.ComputeHash(stream);
             hashes[relPath] = Convert.ToBase64String(hashBytes);
+        }
+
+        return hashes;
+    }
+
+    internal static Dictionary<string, string> ComputeManifestXXH(
+        string baseDir,
+        IEnumerable<string> paths
+    )
+    {
+        Dictionary<string, string> hashes = new();
+        foreach (var path in paths)
+        {
+            var relPath = Path.GetRelativePath(baseDir, path);
+            var hashVal = XXH64.DigestOf(File.ReadAllBytes(path));
+            ////var hashBytes = BitConverter.GetBytes(hashVal);
+            ////hashes[relPath] = Convert.ToBase64String(hashBytes);
+            hashes[relPath] = hashVal.ToString(CultureInfo.InvariantCulture);
         }
 
         return hashes;
