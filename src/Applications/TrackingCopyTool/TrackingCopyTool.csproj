@@ -24,17 +24,20 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Urdep.Extensions.FileSystem\Urdep.Extensions.FileSystem.csproj" />
+        <ProjectReference Include="..\..\Urdep.Extensions.FileSystem\Urdep.Extensions.FileSystem.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="Install.ps1">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
         <None Update="LICENSE">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="README.md">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Install.ps1">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Validate-Parent.ps1">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>
