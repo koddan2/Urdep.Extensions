@@ -10,7 +10,7 @@ using TrackingCopyTool.Utility;
 
 namespace TrackingCopyTool;
 
-internal class Program
+internal static class Program
 {
     private static readonly Dictionary<string, string> _Stage0SwitchMappings =
         new() { ["-c"] = "ConfigurationFile" };
@@ -102,7 +102,7 @@ internal class Program
             var targetFullPath = cfg.Target.FullPath();
             Console.WriteLine("Target: {0}", targetFullPath);
 
-            if (cfg.SourceDirectoryFullPath.ToUpperInvariant() == targetFullPath.ToUpperInvariant())
+            if (string.Equals(cfg.SourceDirectoryFullPath, targetFullPath, StringComparison.InvariantCultureIgnoreCase))
             {
                 Console.WriteLine("ERR: Invalid invocation: source and target are the same");
                 return 1;
@@ -246,6 +246,7 @@ internal class Program
 
                 ////Console.WriteLine("COPY: {0}", path);
                 ////File.Copy(src, tgt, true);
+#pragma warning disable RCS1163 // Unused parameter.
                 new FileCopyHelper().XCopyEz(
                     src,
                     tgt,
@@ -261,6 +262,7 @@ internal class Program
                         return FileCopyHelper.CopyProgressResult.PROGRESS_CONTINUE;
                     }
                 );
+#pragma warning restore RCS1163 // Unused parameter.
                 Console.WriteLine();
                 AppendToRestartManifest(cfg, path, hashes[path]);
                 copiedBytes += new FileInfo(src).Length;
@@ -298,8 +300,8 @@ internal class Program
     {
         Console.Write(
             "\r{0} {1} {2}",
-            $"{(100f * transferred / (float)total):f2}%".PadRight(10, ' '),
-            $"{(total / 1000f):f2} kB".PadRight(20, ' '),
+            $"{100f * transferred / (float)total:f2}%".PadRight(10, ' '),
+            $"{total / 1000f:f2} kB".PadRight(20, ' '),
             path
         );
     }
@@ -317,12 +319,11 @@ internal class Program
             );
             if (test.Length != 2)
             {
-                Console.WriteLine($"ERR: Manifest {targetManifest} is malformed.");
-                Console.WriteLine($"ERR: Double-check that:");
-                Console.WriteLine($"ERR: - it has the correct format,");
-                Console.WriteLine($"ERR: - it encoded in {Encoding.Default.EncodingName},");
-                Console.WriteLine(
-                    $"ERR: - and the paths and hashes are separated by '{cfg.PathHashSeparator}'"
+                Console.WriteLine($@"ERR: Manifest {targetManifest} is malformed.
+ERR: Double-check that:
+ERR: - it has the correct format,
+ERR: - it encoded in {Encoding.Default.EncodingName},
+ERR: - and the paths and hashes are separated by '{cfg.PathHashSeparator}'"
                 );
                 throw new ApplicationException("Could not parse the manifest file.");
             }

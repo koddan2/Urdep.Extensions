@@ -1,6 +1,6 @@
 ﻿namespace TrackingCopyTool.Utility;
 
-internal class Dir
+internal static class Dir
 {
     public static void Ensure(string path)
     {

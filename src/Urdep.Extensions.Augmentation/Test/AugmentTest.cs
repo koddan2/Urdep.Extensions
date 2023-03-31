@@ -7,7 +7,7 @@ public class AugmentTest
     [Test]
     public void TestAugmentedStruct()
     {
-        var i = 0;
+        const int i = 0;
 
         Assert.Multiple(() =>
         {

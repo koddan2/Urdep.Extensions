@@ -28,7 +28,7 @@
         </member>
         <member name="M:TrackingCopyTool.Config.ProgramCfg.DefaultExcludesTransform(System.Collections.Generic.ICollection{System.String})">
             <summary>
-            The transformer which makes sure the the tool's private directory is not included
+            The transformer which makes sure the tool's private directory is not included
             during normal operation.
             </summary>
             <param name="values">The supplied values.</param>

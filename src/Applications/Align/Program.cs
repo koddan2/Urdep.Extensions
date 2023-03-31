@@ -5,7 +5,7 @@ using Urdep.Extensions.Text;
 
 namespace Align;
 
-internal class Program
+internal static class Program
 {
     internal static readonly Arguments arguments = new();
 

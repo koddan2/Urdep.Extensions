@@ -50,7 +50,7 @@ internal static class Optional
 
     public static bool Bool(IConfiguration conf, string key)
     {
-        return Values.Truish(conf[key]);
+        return conf[key].Truish();
     }
 
     public static string String(IConfiguration conf, string key, string? defaultValue = null)
@@ -127,7 +127,9 @@ internal static class ArgsExt
 internal class ProgramCfg
 {
     private readonly IConfiguration _c;
+#pragma warning disable IDE0052 // Remove unread private members
     private readonly Args _args;
+#pragma warning restore IDE0052 // Remove unread private members
 
     public ProgramCfg(IConfiguration c, string[] args)
     {
@@ -166,15 +168,15 @@ internal class ProgramCfg
     public string PrivateDirFullPathTarget => Path.Combine(Target.FullPath(), PrivateDirectoryName);
 
     /// <summary>
-    /// The transformer which makes sure the the tool's private directory is not included
+    /// The transformer which makes sure the tool's private directory is not included
     /// during normal operation.
     /// </summary>
     /// <param name="values">The supplied values.</param>
     /// <returns>The new values which excludes the tool's private directory.</returns>
     ICollection<string> DefaultExcludesTransform(ICollection<string> values)
     {
-        return Enumerable
-            .Concat(values, new[] { Path.Combine(PrivateDirectoryName, "**") })
+        return values
+            .Concat(new[] { Path.Combine(PrivateDirectoryName, "**") })
             .ToList();
     }
 
@@ -266,8 +268,7 @@ internal class ProgramCfg
     /// The full path to the restart manifest file relative to the target directory.
     /// </summary>
     public string RestartManifestFileFullPathTarget =>
-        FilenameExtensions.GetTransformedFileNameKeepParentPath(
-            ManifestFileFullPathTarget,
+        new FileInfo(ManifestFileFullPathTarget).GetTransformedFileNameKeepParentPath(
             n => $"{n}-restart"
         );
 
