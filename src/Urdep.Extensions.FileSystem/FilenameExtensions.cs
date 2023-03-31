@@ -2,7 +2,10 @@
 {
     public static class FilenameExtensions
     {
-        public static string GetTransformedFileNameKeepParentPath(string filename, Func<string,string> renamer)
+        public static string GetTransformedFileNameKeepParentPath(
+            string filename,
+            Func<string, string> renamer
+        )
         {
             var dir = Path.GetDirectoryName(filename);
             var name = Path.GetFileNameWithoutExtension(filename);
@@ -11,7 +14,7 @@
 
             if (dir is not null)
             {
-            return Path.Combine(dir, $"{newName}{ext}");
+                return Path.Combine(dir, $"{newName}{ext}");
             }
             else
             {

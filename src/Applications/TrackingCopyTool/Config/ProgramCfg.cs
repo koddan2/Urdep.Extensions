@@ -157,7 +157,8 @@ internal class ProgramCfg
     /// <summary>
     /// Full path to the tool's private directory relative to the source directory.
     /// </summary>
-    public string PrivateDirFullPathSource => Path.Combine(SourceDirectoryFullPath, PrivateDirectoryName);
+    public string PrivateDirFullPathSource =>
+        Path.Combine(SourceDirectoryFullPath, PrivateDirectoryName);
 
     /// <summary>
     /// Full path to the tool's private directory relative to the target directory.
@@ -172,7 +173,9 @@ internal class ProgramCfg
     /// <returns>The new values which excludes the tool's private directory.</returns>
     ICollection<string> DefaultExcludesTransform(ICollection<string> values)
     {
-        return Enumerable.Concat(values, new[] { Path.Combine(PrivateDirectoryName, "**") }).ToList();
+        return Enumerable
+            .Concat(values, new[] { Path.Combine(PrivateDirectoryName, "**") })
+            .ToList();
     }
 
     /// <summary>
@@ -202,16 +205,14 @@ internal class ProgramCfg
     /// <summary>
     /// This argument tells the tool to force create nodes on the target.
     /// </summary>
-    public bool Force =>
-        Optional.Bool(_c, "Force");
+    public bool Force => Optional.Bool(_c, "Force");
 
     /// <summary>
     /// This argument tells the tool to only generate the manifest file. Useful if the tool
     /// can be installed on the target machine and pre-generate the manifest, so that when
     /// copy operations should start, there is a ready-to-use manifest.
     /// </summary>
-    public bool OnlyGenerateManifest =>
-        Optional.Bool(_c, "OnlyGenerateManifest");
+    public bool OnlyGenerateManifest => Optional.Bool(_c, "OnlyGenerateManifest");
 
     /// <summary>
     /// Tells the tool to only validate the files, given the contents of the existing manifest.
@@ -222,8 +223,7 @@ internal class ProgramCfg
     /// Tells the tool to not keep track of copied files during operation. Disabling this means
     /// that the tool cannot resume a run if it is interrupted (i.e. must start from the beginning).
     /// </summary>
-    public bool DisregardRestartManifest =>
-        Optional.Bool(_c, "DisregardRestartManifest");
+    public bool DisregardRestartManifest => Optional.Bool(_c, "DisregardRestartManifest");
 
     /// <summary>
     /// This argument controls how much output the tool prints.

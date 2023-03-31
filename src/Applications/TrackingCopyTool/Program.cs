@@ -127,7 +127,9 @@ internal class Program
 
         Dir.Ensure(cfg.PrivateDirFullPathSource);
 
-        var hashes = cfg.UseXXH ? ComputeManifestXXH(sourceDir, sourceMatches) : ComputeManifest(sourceDir, sourceMatches, hashAlgo);
+        var hashes = cfg.UseXXH
+            ? ComputeManifestXXH(sourceDir, sourceMatches)
+            : ComputeManifest(sourceDir, sourceMatches, hashAlgo);
         if (cfg.OnlyValidateFiles)
         {
             var readManifest = ReadManifest(cfg.ManifestFileFullPathSource, cfg);
@@ -333,6 +335,7 @@ internal class Program
             .ToHashSet()
             .ToDictionary(x => x.Path, x => x.Hash);
     }
+
     private record Pair(string Path, string Hash);
 
     private static void WriteManifest(ProgramCfg cfg, Dictionary<string, string> hashes)
@@ -385,9 +388,9 @@ internal class Program
         return hashes;
     }
 
-
     public static readonly IxxHashConfig _xxHashConfig = new xxHashConfig { HashSizeInBits = 64 };
     public static readonly IxxHash _xxHash = xxHashFactory.Instance.Create(_xxHashConfig);
+
     internal static Dictionary<string, string> ComputeManifestXXH(
         string baseDir,
         IEnumerable<string> paths

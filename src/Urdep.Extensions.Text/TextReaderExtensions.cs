@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Urdep.Extensions.Text;
 
 public enum TrimMode
@@ -12,64 +14,55 @@ public record TextReaderBlockSkipState(
     string BeginSkipBlock,
     string EndSkipBlock,
     TrimMode TrimMode = TrimMode.None
-)
-{
-    public bool Skipping { get; set; } = false;
-};
-
-public readonly record struct TextReaderBlockSkipResult(bool Skip, string? Line);
+);
 
 public static class TextReaderExtensions
 {
-    public static string ReadAll(this TextReaderBlockSkipState state, TextReader reader)
+    public static string? ReadLine(this TextReaderBlockSkipState state, TextReader reader)
     {
-        var sb = new System.Text.StringBuilder();
-        TextReaderBlockSkipResult readResult;
-        do
-        {
-            readResult = state.ReadLine(reader);
-            if (!readResult.Skip)
-            {
-                sb.AppendLine(readResult.Line);
-            }
-        } while (readResult.Line is not null);
-        return sb.ToString();
-    }
-
-    public static TextReaderBlockSkipResult ReadLine(
-        this TextReaderBlockSkipState state,
-        TextReader reader
-    )
-    {
-        var line = state.TrimMode switch
+        var result = state.TrimMode switch
         {
             TrimMode.None => reader.ReadLine(),
             TrimMode.TrimStart => reader.ReadLine()?.TrimStart(),
             TrimMode.TrimEnd => reader.ReadLine()?.TrimEnd(),
             TrimMode.Trim => reader.ReadLine()?.Trim(),
+            _ => null,
         };
 
-        if (line == state.BeginSkipBlock)
+        return result;
+    }
+
+    public static void ReadInto(
+        this TextReaderBlockSkipState state,
+        StringBuilder sb,
+        TextReader reader
+    )
+    {
+        bool skipping = false;
+
+        var line = state.ReadLine(reader);
+        while (line is not null)
         {
-            state.Skipping = true;
-            return new TextReaderBlockSkipResult(true, line);
-        }
-        else if (line == state.EndSkipBlock)
-        {
-            state.Skipping = false;
-            return new TextReaderBlockSkipResult(true, line);
-        }
-        else if (line is null)
-        {
-            return new TextReaderBlockSkipResult(true, line);
-        }
-        else if (state.Skipping)
-        {
-            return new TextReaderBlockSkipResult(true, line);
-        }
-        else
-        {
-            return new TextReaderBlockSkipResult(false, line);
+            if (line == state.BeginSkipBlock)
+            {
+                skipping = true;
+                line = state.ReadLine(reader);
+                continue;
+            }
+            else if (line == state.EndSkipBlock)
+            {
+                skipping = false;
+                line = state.ReadLine(reader);
+                continue;
+            }
+            if (skipping)
+            {
+                line = state.ReadLine(reader);
+                continue;
+            }
+
+            sb.AppendLine(line);
+            line = state.ReadLine(reader);
         }
     }
 }

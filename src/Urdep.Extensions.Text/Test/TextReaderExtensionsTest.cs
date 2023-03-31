@@ -3,80 +3,27 @@ using System.Text;
 
 namespace Urdep.Extensions.Text.Test;
 
-public class StreamReaderExtensionsTest
+public class TextReaderExtensionsTest
 {
     [Test]
     public void TestBasic1()
     {
-        var text =
+        const string text =
             @"Hello
 --[[SKIP
 some gibberish
 --]]
 Important data
-";
-        var expected =
-            @"Hello
-Important data
-";
-        using var reader = new StringReader(text);
-        var sb = new StringBuilder();
-        var state = new TextReaderBlockSkipState("--[[SKIP", "--]]");
-        TextReaderBlockSkipResult readResult;
-        do
-        {
-            readResult = state.ReadLine(reader);
-            if (!readResult.Skip)
-            {
-                sb.AppendLine(readResult.Line);
-            }
-        } while (readResult.Line is not null);
-        var actual = sb.ToString();
-
-        Assert.That(actual, Is.EqualTo(expected));
-    }
-
-    [Test]
-    public void TestBasic2()
-    {
-        var text =
-            @"Hello
 --[[SKIP
-some gibberish
---]]
-Important data
-
---[[SKIP
+some other gibberish
 --]]
 --[[SKIP
-some MORE gibberish
+
+some other gibberish again
+
 --]]
-TEST~
 ";
-        var expected =
-            @"Hello
-Important data
-
-TEST~
-";
-        using var reader = new StringReader(text);
-        var state = new TextReaderBlockSkipState("--[[SKIP", "--]]");
-        var actual = state.ReadAll(reader);
-
-        Assert.That(actual, Is.EqualTo(expected));
-    }
-
-    [Test]
-    public void TestBasic3()
-    {
-        var text =
-            @"Hello
---[[SKIP
-some gibberish
---]]
-Important data
-";
-        var expected =
+        const string expected =
             @"Hello
 Important data
 ";
@@ -84,17 +31,7 @@ Important data
         var sb = new StringBuilder();
         var state = new TextReaderBlockSkipState("--[[SKIP", "--]]");
 
-        for (
-            TextReaderBlockSkipResult readResult = new(true, string.Empty);
-            readResult.Line is not null;
-            readResult = state.ReadLine(reader)
-        )
-        {
-            if (!readResult.Skip)
-            {
-                sb.AppendLine(readResult.Line);
-            }
-        }
+        state.ReadInto(sb, reader);
         var actual = sb.ToString();
 
         Assert.That(actual, Is.EqualTo(expected));
