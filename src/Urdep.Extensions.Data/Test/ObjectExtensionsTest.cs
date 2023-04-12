@@ -1,8 +1,8 @@
 ﻿using NUnit.Framework;
 using Urdep.Extensions.Augmentation;
+using Urdep.Extensions.Data.Utility;
 
 namespace Urdep.Extensions.Data.Test;
-
 public class ObjectExtensionsTest
 {
     public class MyTestClass
@@ -41,5 +41,16 @@ public class ObjectExtensionsTest
             Assert.That(newInstance.StrValue, Is.EqualTo(dict["StrValue"]));
             Assert.That(newInstance.RefValue, Is.EqualTo(dict["RefValue"]));
         });
+    }
+
+    [Test]
+    public void TestTap1()
+    {
+        var a = Augment.Ref(new List<int> { 1, 2, 3 });
+        Assert.That(a.Value.Count, Is.EqualTo(3));
+        var b = a.Tap(list => list.Add(4));
+        Assert.That(a.Value.Count, Is.EqualTo(4));
+        Assert.That(a.Value, Is.EqualTo(b.Value));
+        Assert.That(a, Is.EqualTo(b));
     }
 }

@@ -46,3 +46,26 @@ public static class ObjectExtensions
             );
     }
 }
+
+public static class MetaExtensions
+{
+    /// <summary>
+    /// In-place update of object - only used for causing a side effect.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// var aug = Augment.Ref(new [] {0, 1, 2})
+    ///   .Tap(arr => arr[0] = 99);
+    /// // aug ~= (Augmented) new [] { 99, 1, 2 };
+    /// </code>
+    /// </example>
+    /// <typeparam name="T">The relevant type.</typeparam>
+    /// <param name="augmented">The augmented object.</param>
+    /// <param name="mutator">The delegate that does the side-effect(s).</param>
+    /// <returns>The mutated value</returns>
+    public static IAugmented<T> Tap<T>(this IAugmented<T> augmented, Action<T> mutator)
+    {
+        mutator(augmented.Value);
+        return augmented;
+    }
+}

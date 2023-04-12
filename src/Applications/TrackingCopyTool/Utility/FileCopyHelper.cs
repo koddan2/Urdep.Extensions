@@ -48,6 +48,7 @@ namespace TrackingCopyTool.Utility
         [Flags]
         enum CopyFileFlags : uint
         {
+            ERROR,
             COPY_FILE_FAIL_IF_EXISTS = 0x00000001,
             COPY_FILE_RESTARTABLE = 0x00000002,
             COPY_FILE_OPEN_SOURCE_FOR_WRITE = 0x00000004,
