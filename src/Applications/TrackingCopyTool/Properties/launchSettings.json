@@ -10,7 +10,7 @@
         },
         "TrackingCopyTool II": {
             "commandName": "Project",
-            "commandLineArgs": "-d c:/temp/src --UseXXH yes --force no --debug:slowerfiletransfers 100 --Target:Name c:/temp/tgt --Target:Create true -v 2 -m special-manifest.txt --excludes **/*.2da"
+            "commandLineArgs": "-d c:/temp/src -v 2 --UseXXH yes --force no --debug:slowerfiletransfers 100 --Target:Name c:/temp/tgt --Target:Create true -m special-manifest.txt --excludes **/*.2da"
         },
         "TrackingCopyTool III": {
             "commandName": "Project",
@@ -22,7 +22,7 @@
         },
         "TrackingCopyTool V": {
             "commandName": "Project",
-            "commandLineArgs": "-d C:/temp/src -v 3 --usexxh yes --target:name c:/temp/tgt"
+            "commandLineArgs": "-d C:/temp/src -v 2 --usexxh no --target:name c:/temp/tgt"
         },
         "TrackingCopyTool VI": {
             "commandName": "Project",

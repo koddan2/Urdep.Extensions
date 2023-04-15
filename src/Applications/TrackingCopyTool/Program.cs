@@ -130,11 +130,13 @@ internal static class Program
         var hashes = cfg.UseXXH
             ? ComputeManifestXXH(sourceDir, sourceMatches)
             : ComputeManifest(sourceDir, sourceMatches, hashAlgo);
+        var hashesDict = hashes.ToDictionary(x => x.Path, x => x.Hash);
+
         if (cfg.OnlyValidateFiles)
         {
             var readManifest = ReadManifest(cfg.ManifestFileFullPathSource, cfg);
             List<string> errors = new();
-            foreach (var item in hashes)
+            foreach (var item in hashesDict)
             {
                 if (readManifest.TryGetValue(item.Key, out string? value))
                 {
@@ -195,7 +197,7 @@ internal static class Program
             var extraHashes = ReadManifest(cfg.RestartManifestFileFullPathTarget, cfg);
             foreach (var kvp in extraHashes)
             {
-                if (cfg.Verbosity > 2)
+                if (cfg.Verbosity > 1)
                 {
                     Console.WriteLine(
                         "Found hash in restart manifest: {0}={1}",
@@ -204,10 +206,11 @@ internal static class Program
                     );
                 }
 
-                if (!targetHashes.ContainsKey(kvp.Key))
-                {
-                    targetHashes[kvp.Key] = kvp.Value;
-                }
+                //if (!targetHashes.ContainsKey(kvp.Key))
+                //{
+                //    targetHashes[kvp.Key] = kvp.Value;
+                //}
+                targetHashes[kvp.Key] = kvp.Value;
             }
         }
 
@@ -223,7 +226,7 @@ internal static class Program
             if (
                 !cfg.Force
                 && targetHashes?.TryGetValue(path, out var hash) is true
-                && hashes[path] == hash
+                && hashesDict[path] == hash
             )
             {
                 Console.WriteLine("SAME: {0}", path);
@@ -264,7 +267,7 @@ internal static class Program
                 );
 #pragma warning restore RCS1163 // Unused parameter.
                 Console.WriteLine();
-                AppendToRestartManifest(cfg, path, hashes[path]);
+                AppendToRestartManifest(cfg, path, hashesDict[path]);
                 copiedBytes += new FileInfo(src).Length;
             }
         }
@@ -300,7 +303,7 @@ internal static class Program
     {
         Console.Write(
             "\r{0} {1} {2}",
-            $"{100f * transferred / (float)total:f2}%".PadRight(10, ' '),
+            $"{100f * Math.Max(transferred, 1) / (float)Math.Max(total, 1):f2}%".PadRight(10, ' '),
             $"{total / 1000f:f2} kB".PadRight(20, ' '),
             path
         );
@@ -313,11 +316,8 @@ internal static class Program
         var firstLine = lines.FirstOrDefault();
         if (firstLine is not null)
         {
-            var test = firstLine.Split(
-                new[] { cfg.PathHashSeparator },
-                StringSplitOptions.TrimEntries
-            );
-            if (test.Length != 2)
+            var test = cfg.IsValidEntry(firstLine);
+            if (!test)
             {
                 Console.WriteLine($@"ERR: Manifest {targetManifest} is malformed.
 ERR: Double-check that:
@@ -330,16 +330,13 @@ ERR: - and the paths and hashes are separated by '{cfg.PathHashSeparator}'"
         }
 
         return lines
-            .Select(x => x.Split(new[] { cfg.PathHashSeparator }, StringSplitOptions.TrimEntries))
-            .Where(x => x.Length == 2)
-            .Select(x => new Pair(x[0], x[1]))
+            .Where(cfg.IsValidEntry)
+            .Select(cfg.ParseEntry)
             .ToHashSet()
             .ToDictionary(x => x.Path, x => x.Hash);
     }
 
-    private record Pair(string Path, string Hash);
-
-    private static void WriteManifest(ProgramCfg cfg, Dictionary<string, string> hashes)
+    private static void WriteManifest(ProgramCfg cfg, HashSet<PathHashPair> hashes)
     {
         var path = cfg.ManifestFileFullPathSource;
         if (File.Exists(path))
@@ -349,41 +346,42 @@ ERR: - and the paths and hashes are separated by '{cfg.PathHashSeparator}'"
 
         using var stream = File.OpenWrite(path);
         using var sw = new StreamWriter(stream);
-        foreach (var kvp in hashes)
+        foreach (var item in hashes)
         {
-            sw.WriteLine("{0}{1}{2}", kvp.Key, cfg.PathHashSeparator, kvp.Value);
+            var entry = cfg.MakeEntry(item.Hash, item.Path);
+            sw.WriteLine("{0}", entry);
         }
     }
 
     private static void AppendToRestartManifest(ProgramCfg cfg, string path, string hash)
     {
         using var sw = new StreamWriter(cfg.RestartManifestFileFullPathTarget, true);
-        sw.WriteLine("{0}{1}{2}", path, cfg.PathHashSeparator, hash);
+        var entry = cfg.MakeEntry(hash, path);
+        sw.WriteLine("{0}", entry);
         if (cfg.Verbosity > 2)
         {
             Console.WriteLine(
-                "Appended({3}): {0}{1}{2}",
-                path,
-                cfg.PathHashSeparator,
-                hash,
+                "Appended({1}): {0}",
+                entry,
                 cfg.RestartManifestFileFullPathTarget
             );
         }
     }
 
-    internal static Dictionary<string, string> ComputeManifest(
+    internal static HashSet<PathHashPair> ComputeManifest(
         string baseDir,
         IEnumerable<string> paths,
         HashAlgorithm hashAlgo
     )
     {
-        Dictionary<string, string> hashes = new();
+        HashSet<PathHashPair> hashes = new();
         foreach (var path in paths)
         {
             var relPath = Path.GetRelativePath(baseDir, path);
             using var stream = File.OpenRead(path);
             var hashBytes = hashAlgo.ComputeHash(stream);
-            hashes[relPath] = Convert.ToBase64String(hashBytes);
+            var hashStr = Convert.ToHexString(hashBytes);
+            hashes.Add(new PathHashPair(hashStr, relPath));
         }
 
         return hashes;
@@ -392,21 +390,40 @@ ERR: - and the paths and hashes are separated by '{cfg.PathHashSeparator}'"
     public static readonly IxxHashConfig _xxHashConfig = new xxHashConfig { HashSizeInBits = 64 };
     public static readonly IxxHash _xxHash = xxHashFactory.Instance.Create(_xxHashConfig);
 
-    internal static Dictionary<string, string> ComputeManifestXXH(
+    internal static HashSet<PathHashPair> ComputeManifestXXH(
         string baseDir,
         IEnumerable<string> paths
     )
     {
-        Dictionary<string, string> hashes = new();
+        HashSet<PathHashPair> hashes = new();
         foreach (var path in paths)
         {
             var relPath = Path.GetRelativePath(baseDir, path);
             using var stream = File.OpenRead(path);
             var hashVal = _xxHash.ComputeHash(stream);
             var ul = BitConverter.ToUInt64(hashVal.Hash);
-            hashes[relPath] = ul.ToString(CultureInfo.InvariantCulture);
+            var hashStr = ul.ToString(CultureInfo.InvariantCulture);
+            hashes.Add(new PathHashPair(hashStr, relPath));
         }
 
         return hashes;
+    }
+}
+
+internal record PathHashPair(string Hash, string Path);
+
+internal static class ProgramExtensions
+{
+    internal static string MakeEntry(this ProgramCfg cfg, string hash, string path) => $"{hash}{cfg.PathHashSeparator}{path}";
+    internal static bool IsValidEntry(this ProgramCfg cfg, string entry)
+        => !string.IsNullOrEmpty(entry)
+        && entry.IndexOf(cfg.PathHashSeparator) is int index
+        && index < (entry.Length - 1);
+    internal static PathHashPair ParseEntry(this ProgramCfg cfg, string entry)
+    {
+        var firstIndexOfSep = entry.IndexOf(cfg.PathHashSeparator);
+        var hash = entry[..firstIndexOfSep];
+        var path = entry[(firstIndexOfSep + cfg.PathHashSeparator.Length)..];
+        return new PathHashPair(hash, path);
     }
 }
