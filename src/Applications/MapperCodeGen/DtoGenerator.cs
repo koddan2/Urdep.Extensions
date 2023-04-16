@@ -16,7 +16,10 @@ public class DtoGenerator : ISourceGenerator
         }
     }
 
-    public static void ExecuteInner(GeneratorExecutionContext context, TargetTypeTracker targetTypeTracker)
+    public static void ExecuteInner(
+        GeneratorExecutionContext context,
+        TargetTypeTracker targetTypeTracker
+    )
     {
         var codeBuilder = new StringBuilder();
 
@@ -24,15 +27,16 @@ public class DtoGenerator : ISourceGenerator
         {
             // Use the semantic model to get the symbol for this type
             var typeNodeSymbol = context.Compilation
-            .GetSemanticModel(typeNode.SyntaxTree)
-            .GetDeclaredSymbol(typeNode);
+                .GetSemanticModel(typeNode.SyntaxTree)
+                .GetDeclaredSymbol(typeNode);
             if (typeNodeSymbol is null)
             {
                 continue;
             }
 
             // get the namespace of the entity class
-            var entityClassNamespace = typeNodeSymbol.ContainingNamespace?.ToDisplayString() ?? "NoNamespace";
+            var entityClassNamespace =
+                typeNodeSymbol.ContainingNamespace?.ToDisplayString() ?? "NoNamespace";
 
             // give each DTO a name, just suffix the entity class name with "Dto"
             var generatedDtoClassName = $"{typeNodeSymbol.Name}Dto";
@@ -53,11 +57,13 @@ public class DtoGenerator : ISourceGenerator
             // get all the properties defined in this class
             var allProperties = typeNode.Members.OfType<PropertyDeclarationSyntax>();
 
-            // for each property in the domain entity, create a corresponding property 
+            // for each property in the domain entity, create a corresponding property
             // in the DTO with the same type
             foreach (var property in allProperties)
             {
-                codeBuilder.Append("\t\t").AppendLine(property.BuildDtoProperty(context.Compilation));
+                codeBuilder
+                    .Append("\t\t")
+                    .AppendLine(property.BuildDtoProperty(context.Compilation));
             }
 
             // Add closing braces
@@ -65,8 +71,10 @@ public class DtoGenerator : ISourceGenerator
             codeBuilder.AppendLine("}");
 
             // add the code for this DTO class to the context so it can be added to the build
-            context.AddSource(generatedDtoClassName,
-                SourceText.From(codeBuilder.ToString(), Encoding.UTF8));
+            context.AddSource(
+                generatedDtoClassName,
+                SourceText.From(codeBuilder.ToString(), Encoding.UTF8)
+            );
             codeBuilder.Clear();
         }
     }

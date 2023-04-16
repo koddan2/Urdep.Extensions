@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MapperCodeGen", "Applicatio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MapperCodeGen.Test", "Applications\MapperCodeGen.Test\MapperCodeGen.Test.csproj", "{28A4FD8C-B0A9-420C-A708-5AC3074131A9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MapperCodeGen.Cli", "Applications\MapperCodeGen.Cli\MapperCodeGen.Cli.csproj", "{CF7AFD0D-10DF-4FAB-BE11-6DDB0568B985}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{28A4FD8C-B0A9-420C-A708-5AC3074131A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28A4FD8C-B0A9-420C-A708-5AC3074131A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28A4FD8C-B0A9-420C-A708-5AC3074131A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF7AFD0D-10DF-4FAB-BE11-6DDB0568B985}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF7AFD0D-10DF-4FAB-BE11-6DDB0568B985}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF7AFD0D-10DF-4FAB-BE11-6DDB0568B985}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF7AFD0D-10DF-4FAB-BE11-6DDB0568B985}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -30,6 +36,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{77E34BDC-0790-47CA-BB80-81E6EDAC1B55} = {6ADAB69A-E1DC-491F-B935-CCB6218188AC}
 		{28A4FD8C-B0A9-420C-A708-5AC3074131A9} = {6ADAB69A-E1DC-491F-B935-CCB6218188AC}
+		{CF7AFD0D-10DF-4FAB-BE11-6DDB0568B985} = {6ADAB69A-E1DC-491F-B935-CCB6218188AC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B0365066-0E78-40E3-8E57-5CD158A5D520}

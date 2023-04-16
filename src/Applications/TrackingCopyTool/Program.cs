@@ -102,7 +102,13 @@ internal static class Program
             var targetFullPath = cfg.Target.FullPath();
             Console.WriteLine("Target: {0}", targetFullPath);
 
-            if (string.Equals(cfg.SourceDirectoryFullPath, targetFullPath, StringComparison.InvariantCultureIgnoreCase))
+            if (
+                string.Equals(
+                    cfg.SourceDirectoryFullPath,
+                    targetFullPath,
+                    StringComparison.InvariantCultureIgnoreCase
+                )
+            )
             {
                 Console.WriteLine("ERR: Invalid invocation: source and target are the same");
                 return 1;
@@ -319,7 +325,8 @@ internal static class Program
             var test = cfg.IsValidEntry(firstLine);
             if (!test)
             {
-                Console.WriteLine($@"ERR: Manifest {targetManifest} is malformed.
+                Console.WriteLine(
+                    $@"ERR: Manifest {targetManifest} is malformed.
 ERR: Double-check that:
 ERR: - it has the correct format,
 ERR: - it encoded in {Encoding.Default.EncodingName},
@@ -360,11 +367,7 @@ ERR: - and the paths and hashes are separated by '{cfg.PathHashSeparator}'"
         sw.WriteLine("{0}", entry);
         if (cfg.Verbosity > 2)
         {
-            Console.WriteLine(
-                "Appended({1}): {0}",
-                entry,
-                cfg.RestartManifestFileFullPathTarget
-            );
+            Console.WriteLine("Appended({1}): {0}", entry, cfg.RestartManifestFileFullPathTarget);
         }
     }
 
@@ -414,11 +417,14 @@ internal record PathHashPair(string Hash, string Path);
 
 internal static class ProgramExtensions
 {
-    internal static string MakeEntry(this ProgramCfg cfg, string hash, string path) => $"{hash}{cfg.PathHashSeparator}{path}";
-    internal static bool IsValidEntry(this ProgramCfg cfg, string entry)
-        => !string.IsNullOrEmpty(entry)
+    internal static string MakeEntry(this ProgramCfg cfg, string hash, string path) =>
+        $"{hash}{cfg.PathHashSeparator}{path}";
+
+    internal static bool IsValidEntry(this ProgramCfg cfg, string entry) =>
+        !string.IsNullOrEmpty(entry)
         && entry.IndexOf(cfg.PathHashSeparator) is int index
         && index < (entry.Length - 1);
+
     internal static PathHashPair ParseEntry(this ProgramCfg cfg, string entry)
     {
         var firstIndexOfSep = entry.IndexOf(cfg.PathHashSeparator);

@@ -2,7 +2,11 @@
 {
     public static class DirectoryInfoExtensions
     {
-        public static DirectoryInfo? WalkUpUntil(this DirectoryInfo directoryInfo, Func<DirectoryInfo, bool> test, int maxLevels = 10)
+        public static DirectoryInfo? WalkUpUntil(
+            this DirectoryInfo directoryInfo,
+            Func<DirectoryInfo, bool> test,
+            int maxLevels = 10
+        )
         {
             var counter = 0;
             var di = directoryInfo;

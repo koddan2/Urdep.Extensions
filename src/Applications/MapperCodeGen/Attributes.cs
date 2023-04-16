@@ -23,6 +23,4 @@ public class MapPropertyAttribute : Attribute
 }
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false)]
-public class GenerateMappedDtoAttribute : Attribute
-{
-}
+public class GenerateMappedDtoAttribute : Attribute { }

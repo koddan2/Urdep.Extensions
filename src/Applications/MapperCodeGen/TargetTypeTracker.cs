@@ -13,7 +13,10 @@ public class TargetTypeTracker : ISyntaxContextReceiver
     {
         if (context.Node is TypeDeclarationSyntax cdecl)
         {
-            if (cdecl.IsDecoratedWithAttribute(nameof(GenerateMappedDtoAttribute)) && context.Node is TypeDeclarationSyntax typeDeclSyn)
+            if (
+                cdecl.IsDecoratedWithAttribute(nameof(GenerateMappedDtoAttribute))
+                && context.Node is TypeDeclarationSyntax typeDeclSyn
+            )
             {
                 TypesNeedingDtoGening = TypesNeedingDtoGening.Add(typeDeclSyn);
             }

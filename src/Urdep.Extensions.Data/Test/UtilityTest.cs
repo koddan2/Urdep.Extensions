@@ -13,7 +13,7 @@ public class UtilityTest
         {
             return source.FirstOrDefault();
         }
-        var arr = new [] { "" };
+        var arr = new[] { "" };
         var message = GetValue(arr).Here(out var result, "TEST");
         Assert.Multiple(() =>
         {

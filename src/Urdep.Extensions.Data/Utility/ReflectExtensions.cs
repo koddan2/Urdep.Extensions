@@ -25,11 +25,13 @@ public static class ReflectExtensions
         [CallerArgumentExpression(nameof(maybeValue))] string? context = null,
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "",
-        [CallerLineNumber] int sourceLineNumber = 0)
+        [CallerLineNumber] int sourceLineNumber = 0
+    )
     {
         var defaultValue = string.Empty;
         var msg = message is null ? defaultValue : $" '{message}'";
-        var result = $"<{typeof(T).Name}>[{context ?? defaultValue}]{msg} (in {memberName}) → {sourceFilePath}:{sourceLineNumber}";
+        var result =
+            $"<{typeof(T).Name}>[{context ?? defaultValue}]{msg} (in {memberName}) → {sourceFilePath}:{sourceLineNumber}";
         output = maybeValue;
         return result ?? "";
     }
@@ -56,14 +58,18 @@ public static class ReflectExtensions
         [CallerArgumentExpression(nameof(maybeValue))] string? context = null,
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "",
-        [CallerLineNumber] int sourceLineNumber = 0)
+        [CallerLineNumber] int sourceLineNumber = 0
+    )
         where T : struct
     {
-        string GetMsg() => $"{(message is not null ? message + " - " : "")}expression: ({context}) (in member {memberName}) {sourceFilePath}:{sourceLineNumber}";
+        string GetMsg() =>
+            $"{(message is not null ? message + " - " : "")}expression: ({context}) (in member {memberName}) {sourceFilePath}:{sourceLineNumber}";
         return maybeValue
-            ?? (exceptionMaker is null
-                ? throw new InvariantFailedException(GetMsg())
-                : throw exceptionMaker(new InvariantFailedException(GetMsg())));
+            ?? (
+                exceptionMaker is null
+                    ? throw new InvariantFailedException(GetMsg())
+                    : throw exceptionMaker(new InvariantFailedException(GetMsg()))
+            );
     }
 
     /// <summary>
@@ -88,14 +94,18 @@ public static class ReflectExtensions
         [CallerArgumentExpression(nameof(maybeValue))] string? context = null,
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "",
-        [CallerLineNumber] int sourceLineNumber = 0)
+        [CallerLineNumber] int sourceLineNumber = 0
+    )
         where T : class
     {
-        string GetMsg() => $"{(message is not null ? message + " - " : "")}expression: ({context}) (in member {memberName}) {sourceFilePath}:{sourceLineNumber}";
+        string GetMsg() =>
+            $"{(message is not null ? message + " - " : "")}expression: ({context}) (in member {memberName}) {sourceFilePath}:{sourceLineNumber}";
         return maybeValue
-            ?? (exceptionMaker is null
-                ? throw new InvariantFailedException(GetMsg())
-                : throw exceptionMaker(new InvariantFailedException(GetMsg())));
+            ?? (
+                exceptionMaker is null
+                    ? throw new InvariantFailedException(GetMsg())
+                    : throw exceptionMaker(new InvariantFailedException(GetMsg()))
+            );
     }
 
     /// <summary>
@@ -120,13 +130,17 @@ public static class ReflectExtensions
         [CallerArgumentExpression(nameof(maybeValue))] string? context = null,
         [CallerMemberName] string memberName = "",
         [CallerFilePath] string sourceFilePath = "",
-        [CallerLineNumber] int sourceLineNumber = 0)
+        [CallerLineNumber] int sourceLineNumber = 0
+    )
         where T : class
     {
-        string GetMsg() => $"{(message is not null ? message + " - " : "")}expression: ({context}) (in member {memberName}) {sourceFilePath}:{sourceLineNumber}";
+        string GetMsg() =>
+            $"{(message is not null ? message + " - " : "")}expression: ({context}) (in member {memberName}) {sourceFilePath}:{sourceLineNumber}";
         return await maybeValue
-            ?? (exceptionMaker is null
-                ? throw new InvariantFailedException(GetMsg())
-                : throw exceptionMaker(new InvariantFailedException(GetMsg())));
+            ?? (
+                exceptionMaker is null
+                    ? throw new InvariantFailedException(GetMsg())
+                    : throw exceptionMaker(new InvariantFailedException(GetMsg()))
+            );
     }
 }

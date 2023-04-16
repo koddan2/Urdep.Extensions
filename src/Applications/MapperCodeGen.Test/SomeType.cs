@@ -13,6 +13,7 @@ internal class SomeExternalType
     public int Age { get; set; }
     public string Name { get; set; } = "";
 }
+
 [MapFrom(nameof(SomeExternalType))]
 internal class SomeCustomType
 {

@@ -175,9 +175,7 @@ internal class ProgramCfg
     /// <returns>The new values which excludes the tool's private directory.</returns>
     ICollection<string> DefaultExcludesTransform(ICollection<string> values)
     {
-        return values
-            .Concat(new[] { Path.Combine(PrivateDirectoryName, "**") })
-            .ToList();
+        return values.Concat(new[] { Path.Combine(PrivateDirectoryName, "**") }).ToList();
     }
 
     /// <summary>

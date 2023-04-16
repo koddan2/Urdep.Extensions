@@ -6,10 +6,11 @@ namespace MapperCodeGen;
 internal static class SourceAnalysisExtensions
 {
     internal static bool IsDecoratedWithAttribute(
-        this TypeDeclarationSyntax cdecl, string attributeName)
+        this TypeDeclarationSyntax cdecl,
+        string attributeName
+    )
     {
-        var attrs = cdecl.AttributeLists
-            .SelectMany(x => x.Attributes);
+        var attrs = cdecl.AttributeLists.SelectMany(x => x.Attributes);
         return HasAttribute(attributeName, attrs);
     }
 
@@ -17,8 +18,7 @@ internal static class SourceAnalysisExtensions
     {
         foreach (var attr in attrs)
         {
-            if (attr.Name.ToString() == attributeName
-                || $"{attr.Name}Attribute" == attributeName)
+            if (attr.Name.ToString() == attributeName || $"{attr.Name}Attribute" == attributeName)
             {
                 return true;
             }

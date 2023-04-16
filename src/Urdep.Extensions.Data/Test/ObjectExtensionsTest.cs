@@ -3,6 +3,7 @@ using Urdep.Extensions.Augmentation;
 using Urdep.Extensions.Data.Utility;
 
 namespace Urdep.Extensions.Data.Test;
+
 public class ObjectExtensionsTest
 {
     public class MyTestClass

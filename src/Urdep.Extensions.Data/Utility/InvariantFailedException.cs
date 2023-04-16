@@ -20,10 +20,17 @@
     public class InvariantFailedException : Exception
     {
         public InvariantFailedException() { }
-        public InvariantFailedException(string message) : base(message) { }
-        public InvariantFailedException(string message, Exception inner) : base(message, inner) { }
+
+        public InvariantFailedException(string message)
+            : base(message) { }
+
+        public InvariantFailedException(string message, Exception inner)
+            : base(message, inner) { }
+
         protected InvariantFailedException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+            System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context
+        )
+            : base(info, context) { }
     }
 }

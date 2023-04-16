@@ -6,12 +6,12 @@ namespace MapperCodeGen;
 internal static class SourceGenerationExtensions
 {
     internal static string BuildDtoProperty(
-        this PropertyDeclarationSyntax pds, Compilation compilation)
+        this PropertyDeclarationSyntax pds,
+        Compilation compilation
+    )
     {
         // get the symbol for this property from the semantic model
-        var symbol = compilation
-                    .GetSemanticModel(pds.SyntaxTree)
-                    .GetDeclaredSymbol(pds);
+        var symbol = compilation.GetSemanticModel(pds.SyntaxTree).GetDeclaredSymbol(pds);
 
         if (symbol is IPropertySymbol property)
         {
