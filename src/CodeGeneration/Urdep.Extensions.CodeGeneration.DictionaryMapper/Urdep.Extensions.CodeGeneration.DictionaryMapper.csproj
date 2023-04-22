@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+    </PropertyGroup>
+
+    <!-- SEE https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.cookbook.md -->
+    <PropertyGroup>
+        <!-- Generates a package on build -->
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <!-- Do not include the generator as a lib dependency -->
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <!--
+        https://learn.microsoft.com/en-us/nuget/reference/errors-and-warnings/nu5128#solution
+        https://learn.microsoft.com/en-us/nuget/reference/msbuild-targets#suppressing-dependencies
+        -->
+        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Package the generator in the analyzer directory of the nuget package -->
+        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis" Version="4.5.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" PrivateAssets="All" />
+    </ItemGroup>
+</Project>
