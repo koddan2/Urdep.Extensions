@@ -18,7 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Urdep.Extensions.CodeGeneration.DictionaryMapper\Urdep.Extensions.CodeGeneration.DictionaryMapper.csproj"
-                          OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\Urdep.Extensions.CodeGeneration.DictionaryMapper.Meta\Urdep.Extensions.CodeGeneration.DictionaryMapper.Meta.csproj" />
+        <ProjectReference Include="..\Urdep.Extensions.CodeGeneration.DictionaryMapper\Urdep.Extensions.CodeGeneration.DictionaryMapper.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 </Project>
