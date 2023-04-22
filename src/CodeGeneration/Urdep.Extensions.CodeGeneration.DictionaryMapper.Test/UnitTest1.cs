@@ -24,6 +24,9 @@ namespace Urdep.Extensions.CodeGeneration.DictionaryMapper.Test
         public int? Id { get; set; }
     }
 
+    [GenerateDictionaryMappingExtensionMethods]
+    public readonly record struct ReadOnlyRecordStructType1(int Id, string Name);
+
     public class Tests
     {
         [SetUp]
@@ -126,6 +129,20 @@ namespace Urdep.Extensions.CodeGeneration.DictionaryMapper.Test
             {
                 var dto = dict.FromDictionaryToSimpleDto();
             });
+        }
+
+        [Test]
+        public void Test7()
+        {
+            var dto = new ReadOnlyRecordStructType1(42, "Gandalf");
+            var dict = dto.ToDictionary();
+            Assert.Multiple(() =>
+            {
+                Assert.That(dict["Id"], Is.EqualTo(dto.Id));
+                Assert.That(dict["Name"], Is.EqualTo(dto.Name));
+            });
+            var dto2 = dict.FromDictionaryToReadOnlyRecordStructType1();
+            Assert.That(dto2, Is.EqualTo(dto));
         }
     }
 }

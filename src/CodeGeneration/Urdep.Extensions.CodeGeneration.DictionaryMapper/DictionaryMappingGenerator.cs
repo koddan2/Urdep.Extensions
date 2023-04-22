@@ -1,8 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using System.Diagnostics;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace Urdep.Extensions.CodeGeneration.DictionaryMapper;

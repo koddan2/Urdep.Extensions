@@ -234,6 +234,9 @@
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "4.5.3"
         }
+      },
+      "urdep.extensions.codegeneration.dictionarymapper.meta": {
+        "type": "Project"
       }
     }
   }
