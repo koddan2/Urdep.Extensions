@@ -1,5 +1,5 @@
-
 using Urdep.Extensions.CodeGeneration.DictionaryMapper.Test.DictionaryMapping;
+
 namespace Urdep.Extensions.CodeGeneration.DictionaryMapper.Test
 {
     public record SomeComplexThing
@@ -10,10 +10,8 @@ namespace Urdep.Extensions.CodeGeneration.DictionaryMapper.Test
     [GenerateDictionaryMappingExtensionMethods]
     public record NotSoSimpleDto(int Id, string Name)
     {
-        public SomeComplexThing Thing { get; set; } = new SomeComplexThing()
-        {
-            Version = Version.Parse("1.0.0.0"),
-        };
+        public SomeComplexThing Thing { get; set; } =
+            new SomeComplexThing() { Version = Version.Parse("1.0.0.0"), };
         public Guid? MaybeGuid { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
@@ -30,9 +28,7 @@ namespace Urdep.Extensions.CodeGeneration.DictionaryMapper.Test
     public class Tests
     {
         [SetUp]
-        public void Setup()
-        {
-        }
+        public void Setup() { }
 
         [Test]
         public void Test1()
@@ -56,11 +52,12 @@ namespace Urdep.Extensions.CodeGeneration.DictionaryMapper.Test
         public void Test6()
         {
             var dto = new NotSoSimpleDto(42, "Gandalf");
-            Dictionary<string, object?> dict = new()
-            {
-                // should be ignored
-                ["BOGUS"] = "GARBAGE",
-            };
+            Dictionary<string, object?> dict =
+                new()
+                {
+                    // should be ignored
+                    ["BOGUS"] = "GARBAGE",
+                };
             dto.IntoDictionary(dict);
             Assert.Multiple(() =>
             {
@@ -78,10 +75,7 @@ namespace Urdep.Extensions.CodeGeneration.DictionaryMapper.Test
         [Test]
         public void Test2()
         {
-            Dictionary<string, object?> dict = new()
-            {
-                ["Name"] = "Test",
-            };
+            Dictionary<string, object?> dict = new() { ["Name"] = "Test", };
             var dto = dict.FromDictionaryToSimpleDto();
             Assert.Multiple(() =>
             {
@@ -93,11 +87,7 @@ namespace Urdep.Extensions.CodeGeneration.DictionaryMapper.Test
         [Test]
         public void Test3()
         {
-            Dictionary<string, object?> dict = new()
-            {
-                ["Name"] = "Test",
-                ["Id"] = null,
-            };
+            Dictionary<string, object?> dict = new() { ["Name"] = "Test", ["Id"] = null, };
             var dto = dict.FromDictionaryToSimpleDto();
             Assert.Multiple(() =>
             {
@@ -109,10 +99,7 @@ namespace Urdep.Extensions.CodeGeneration.DictionaryMapper.Test
         [Test]
         public void Test4()
         {
-            Dictionary<string, object?> dict = new()
-            {
-                ["Name"] = null,
-            };
+            Dictionary<string, object?> dict = new() { ["Name"] = null, };
             Assert.Throws<ArgumentException>(() =>
             {
                 var dto = dict.FromDictionaryToSimpleDto();
@@ -122,9 +109,7 @@ namespace Urdep.Extensions.CodeGeneration.DictionaryMapper.Test
         [Test]
         public void Test5()
         {
-            Dictionary<string, object?> dict = new()
-            {
-            };
+            Dictionary<string, object?> dict = new() { };
             Assert.Throws<KeyNotFoundException>(() =>
             {
                 var dto = dict.FromDictionaryToSimpleDto();
