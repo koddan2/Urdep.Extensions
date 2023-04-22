@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Urdep.Extensions.CodeGenera
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Urdep.Extensions.CodeGeneration.DictionaryMapper.Test", "Urdep.Extensions.CodeGeneration.DictionaryMapper.Test\Urdep.Extensions.CodeGeneration.DictionaryMapper.Test.csproj", "{71DED49C-E9A1-4996-A1A2-10272693A270}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Urdep.Extensions.CodeGeneration.DictionaryMapper.Meta", "Urdep.Extensions.CodeGeneration.DictionaryMapper.Meta\Urdep.Extensions.CodeGeneration.DictionaryMapper.Meta.csproj", "{503BE591-9668-4590-AEAF-77B0715BF231}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Urdep.Extensions.CodeGeneration.DictionaryMapper.Meta", "Urdep.Extensions.CodeGeneration.DictionaryMapper.Meta\Urdep.Extensions.CodeGeneration.DictionaryMapper.Meta.csproj", "{503BE591-9668-4590-AEAF-77B0715BF231}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Urdep.Extensions.CodeGeneration.DictionaryMapper.Benchmarking", "Urdep.Extensions.CodeGeneration.DictionaryMapper.Benchmarking\Urdep.Extensions.CodeGeneration.DictionaryMapper.Benchmarking.csproj", "{F7A07B17-14B3-462C-B586-CC4F32FB3948}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{503BE591-9668-4590-AEAF-77B0715BF231}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{503BE591-9668-4590-AEAF-77B0715BF231}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{503BE591-9668-4590-AEAF-77B0715BF231}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7A07B17-14B3-462C-B586-CC4F32FB3948}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7A07B17-14B3-462C-B586-CC4F32FB3948}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7A07B17-14B3-462C-B586-CC4F32FB3948}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7A07B17-14B3-462C-B586-CC4F32FB3948}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

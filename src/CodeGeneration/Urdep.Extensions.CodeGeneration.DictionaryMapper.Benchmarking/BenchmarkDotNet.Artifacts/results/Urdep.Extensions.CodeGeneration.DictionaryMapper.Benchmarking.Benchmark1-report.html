@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>Urdep.Extensions.CodeGeneration.DictionaryMapper.Benchmarking.Benchmark1-20230422-071200</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet=v0.13.5, OS=Windows 10 (10.0.19044.2846/21H2/November2021Update)
+11th Gen Intel Core i7-11700KF 3.60GHz, 1 CPU, 16 logical and 8 physical cores
+.NET SDK=7.0.203
+  [Host]     : .NET 7.0.5 (7.0.523.17405), X64 RyuJIT AVX2
+  DefaultJob : .NET 7.0.5 (7.0.523.17405), X64 RyuJIT AVX2
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>     Method</th><th>Mean</th><th>Error</th><th>StdDev</th>
+</tr>
+</thead><tbody><tr><td>FromObject1</td><td>691.5 ns</td><td>9.57 ns</td><td>8.48 ns</td>
+</tr><tr><td>FromToDictionary1</td><td>1,649.9 ns</td><td>14.14 ns</td><td>11.81 ns</td>
+</tr><tr><td>FromDictionary1</td><td>984.9 ns</td><td>9.44 ns</td><td>7.89 ns</td>
+</tr><tr><td>FromObject2</td><td>985.6 ns</td><td>14.16 ns</td><td>13.24 ns</td>
+</tr><tr><td>FromToDictionary2</td><td>1,325.6 ns</td><td>7.32 ns</td><td>5.71 ns</td>
+</tr><tr><td>FromDictionary2</td><td>862.3 ns</td><td>9.13 ns</td><td>8.54 ns</td>
+</tr></tbody></table>
+</body>
+</html>
