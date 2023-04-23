@@ -14,7 +14,9 @@
     /// }
     /// </code>
     /// </example>
-    /// <seealso cref="https://github.com/dotnet/roslyn/issues/47066#issuecomment-1124926236"/>
+    /// <remarks>
+    /// https://github.com/dotnet/roslyn/issues/47066#issuecomment-1124926236
+    /// </remarks>
     /// </summary>
     [Serializable]
     public class InvariantFailedException : Exception

@@ -1,5 +1,6 @@
 <Project>
     <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
         <Authors>koddan2@outlook.com</Authors>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

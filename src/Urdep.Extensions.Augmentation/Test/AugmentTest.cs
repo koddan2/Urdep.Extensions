@@ -1,4 +1,6 @@
 using NUnit.Framework;
+using System.Linq.Expressions;
+using System;
 
 namespace Urdep.Extensions.Augmentation.Test;
 
@@ -68,5 +70,48 @@ public class AugmentTest
             Assert.That(a1, Is.EqualTo(a2));
             Assert.That(a1 is IAugmented<object>, Is.True);
         });
+    }
+
+    public static class Creator<T>
+    {
+        public static readonly Func<T> Construct = Expression
+            .Lambda<Func<T>>(Expression.New(typeof(T)))
+            .Compile();
+    }
+
+    public class Creator
+    {
+        private readonly Type _type;
+        public readonly Func<object> Construct;
+
+        public Creator(Type type)
+        {
+            _type = type;
+            Construct = Expression.Lambda<Func<object>>(Expression.New(_type)).Compile();
+        }
+
+        public Type Type => _type;
+    }
+
+    record TestRec1
+    {
+        public int MyProperty { get; set; } = 0;
+    }
+
+    [Test]
+    public void TestSO1()
+    {
+        // https://stackoverflow.com/a/29972767
+        static void DoTests(TestRec1 instance)
+        {
+            Assert.That(instance, Is.Not.Null);
+            Assert.That(instance, Is.EqualTo(new TestRec1()));
+        }
+        var o1 = Creator<TestRec1>.Construct();
+        DoTests(o1);
+        var o2 = new Creator(typeof(TestRec1)).Construct();
+        DoTests((TestRec1)o2);
+
+        Assert.That(o1, Is.EqualTo(o2));
     }
 }
