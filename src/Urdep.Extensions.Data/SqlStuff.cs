@@ -15,7 +15,7 @@ public static class SqlStuff
             case SQLType.filestream:
             case SQLType.image:
             case SQLType.rowversion:
-            case SQLType.timestamp://?
+            case SQLType.timestamp: //?
                 return "byte[]";
             case SQLType.tinyint:
                 return "byte";
@@ -65,13 +65,13 @@ public static class SqlStuff
 
     public enum SQLType
     {
-        varbinary,//(1)
-        binary,//(1)
+        varbinary, //(1)
+        binary, //(1)
         image,
         varchar,
         @char,
-        nvarchar,//(1)
-        nchar,//(1)
+        nvarchar, //(1)
+        nchar, //(1)
         text,
         ntext,
         uniqueidentifier,
