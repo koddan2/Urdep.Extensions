@@ -81,16 +81,15 @@ public class AugmentTest
 
     public class Creator
     {
-        private readonly Type _type;
         public readonly Func<object> Construct;
 
         public Creator(Type type)
         {
-            _type = type;
-            Construct = Expression.Lambda<Func<object>>(Expression.New(_type)).Compile();
+            Type = type;
+            Construct = Expression.Lambda<Func<object>>(Expression.New(Type)).Compile();
         }
 
-        public Type Type => _type;
+        public Type Type { get; }
     }
 
     record TestRec1
