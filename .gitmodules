@@ -1,3 +1,0 @@
-[submodule "Tools/Invoke-Build"]
-	path = Tools/Invoke-Build
-	url = https://github.com/nightroman/Invoke-Build.git
