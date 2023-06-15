@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net7.0": {
+      "urdep.extensions.text": {
+        "type": "Project"
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<pipeline>
+    <input type="filesystem" name="./source-file.txt" />
+    <steps>
+        <replace-tokens>
+            <token placeholder="%{REPLACE-ME}%">
+                <value>World</value>
+            </token>
+        </replace-tokens>
+    </steps>
+    <output type="filesystem" name="output.txt" />
+</pipeline>

@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "textron, help": {
+      "commandName": "Project",
+      "commandLineArgs": "?"
+    },
+    "textron, simplest": {
+      "commandName": "Project",
+      "commandLineArgs": "$(MSBuildProjectDirectory)/Examples/Simplest/pipeline.xml"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<pipeline>
+    <input type="filesystem" name="./source-file.sql" />
+    <steps>
+        <remove-text type="lines" begin-block="--[[INTERACTIVE" end-block="--]]" />
+        <replace-tokens>
+            <token placeholder="REPLACE-WITH($env:SystemDrive)">
+                <environment-variable>SystemDrive</environment-variable>
+            </token>
+            <token placeholder="/*REPLACE-WITH(@p0)*/">
+                <value>@p0</value>
+            </token>
+        </replace-tokens>
+        <render-template type="simple">
+            <template name="./template.xml" />
+            <placeholder value="RENDER-HERE" />
+        </render-template>
+    </steps>
+    <output type="filesystem" name="output.txt" />
+</pipeline>
