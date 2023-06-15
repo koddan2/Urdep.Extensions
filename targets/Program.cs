@@ -63,6 +63,7 @@ namespace targets
 
             public static string TrackingCopyTool = PathToAppCsProj("TrackingCopyTool");
             public static string Align = PathToAppCsProj("Align");
+            public static string SimpleTransformer = PathToAppCsProj("SimpleTransformer");
 
             public static IEnumerable<string> AllLibraries()
             {
@@ -76,6 +77,7 @@ namespace targets
             {
                 yield return TrackingCopyTool;
                 yield return Align;
+                yield return SimpleTransformer;
             }
 
             public static IEnumerable<string> All()

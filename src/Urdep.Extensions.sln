@@ -19,7 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Urdep.Extensions.FileSystem
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "targets", "..\targets\targets.csproj", "{906A3015-1175-4523-994D-15FDE99B0402}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{B84305D0-C582-466F-8EAA-DEC086B109DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{B84305D0-C582-466F-8EAA-DEC086B109DA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleTransformer", "Applications\SimpleTransformer\SimpleTransformer.csproj", "{1E047F08-7E0E-4462-8F81-453C50DC93C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +61,10 @@ Global
 		{B84305D0-C582-466F-8EAA-DEC086B109DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B84305D0-C582-466F-8EAA-DEC086B109DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B84305D0-C582-466F-8EAA-DEC086B109DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E047F08-7E0E-4462-8F81-453C50DC93C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E047F08-7E0E-4462-8F81-453C50DC93C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E047F08-7E0E-4462-8F81-453C50DC93C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E047F08-7E0E-4462-8F81-453C50DC93C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,6 +72,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{19224884-1AE6-4DFC-AFB5-75E07CC481BE} = {6ADAB69A-E1DC-491F-B935-CCB6218188AC}
 		{FEDD7402-E5A0-4752-9ECD-709644D28600} = {6ADAB69A-E1DC-491F-B935-CCB6218188AC}
+		{1E047F08-7E0E-4462-8F81-453C50DC93C7} = {6ADAB69A-E1DC-491F-B935-CCB6218188AC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B0365066-0E78-40E3-8E57-5CD158A5D520}

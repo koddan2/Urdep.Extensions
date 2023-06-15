@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SimpleTransformer (simple example)": {
+      "commandName": "Project",
+      "commandLineArgs": "$(MSBuildProjectDirectory)/Examples/Simple/example.ini"
+    }
+  }
+}
