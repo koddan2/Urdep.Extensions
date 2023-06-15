@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
+using Urdep.Extensions.FileSystem;
 
-namespace Urdep.Extensions.FileSystem.Test;
+namespace Tests.FileSystem;
 
 internal class BasicTests
 {
@@ -13,7 +14,7 @@ internal class BasicTests
             x =>
                 x.EnumerateFiles()
                     .Select(fi => fi.Name)
-                    .Contains("Urdep.Extensions.FileSystem.csproj")
+                    .Contains("Tests.csproj")
         );
         Assert.That(somwhere, Is.Not.Null);
 

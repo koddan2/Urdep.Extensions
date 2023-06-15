@@ -1,10 +1,17 @@
 ﻿using NUnit.Framework;
 using System.Text;
+using Urdep.Extensions.Text;
 
-namespace Urdep.Extensions.Text.Test;
+namespace Tests.Text;
 
+/// <summary>
+/// Tests for text reader extensions
+/// </summary>
 public class TextReaderExtensionsTest
 {
+    /// <summary>
+    /// Basic test 1 - line based trimming of content.
+    /// </summary>
     [Test]
     public void TestBasic1()
     {

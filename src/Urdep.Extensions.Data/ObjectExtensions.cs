@@ -4,8 +4,17 @@ using Urdep.Extensions.Augmentation;
 
 namespace Urdep.Extensions.Data;
 
+/// <summary>
+/// Object extensions
+/// </summary>
 public static class ObjectExtensions
 {
+    /// <summary>
+    /// Transform into an object, runtime reflection
+    /// </summary>
+    /// <typeparam name="T">The type</typeparam>
+    /// <param name="source">The source data</param>
+    /// <returns>The result</returns>
     public static T TransformInto<T>(this IDictionary<string, object?> source)
         where T : class, new()
     {
@@ -33,6 +42,13 @@ public static class ObjectExtensions
     private const BindingFlags _DefaultBindingFlags =
         BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance;
 
+    /// <summary>
+    /// Construct a dictionary from the given instance. Runtime reflection.
+    /// </summary>
+    /// <typeparam name="T">The type.</typeparam>
+    /// <param name="source">The source of the data.</param>
+    /// <param name="bindingAttr">The binding attributes.</param>
+    /// <returns>The dictionary</returns>
     public static IDictionary<string, object?> AsDictionary<T>(
         this IAugmented<T> source,
         BindingFlags bindingAttr = _DefaultBindingFlags
@@ -47,6 +63,9 @@ public static class ObjectExtensions
     }
 }
 
+/// <summary>
+/// Meta extensions
+/// </summary>
 public static class MetaExtensions
 {
     /// <summary>

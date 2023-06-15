@@ -21,14 +21,31 @@
     [Serializable]
     public class InvariantFailedException : Exception
     {
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public InvariantFailedException() { }
 
+        /// <summary>
+        /// Constructor with a message.
+        /// </summary>
+        /// <param name="message">The message</param>
         public InvariantFailedException(string message)
             : base(message) { }
 
+        /// <summary>
+        /// Constructor with a message and an inner exception.
+        /// </summary>
+        /// <param name="message">The message</param>
+        /// <param name="inner">The inner exception</param>
         public InvariantFailedException(string message, Exception inner)
             : base(message, inner) { }
 
+        /// <summary>
+        /// Protected constructor for serialization purposes.
+        /// </summary>
+        /// <param name="info">The info</param>
+        /// <param name="context">The context</param>
         protected InvariantFailedException(
             System.Runtime.Serialization.SerializationInfo info,
             System.Runtime.Serialization.StreamingContext context

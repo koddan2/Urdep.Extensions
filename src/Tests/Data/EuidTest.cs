@@ -1,10 +1,17 @@
 ﻿using NUnit.Framework;
 using System.Text.Json;
+using Urdep.Extensions.Data;
 
-namespace Urdep.Extensions.Data.Test;
+namespace Tests.Data;
 
+/// <summary>
+/// Tests for Euid
+/// </summary>
 public class EuidTest
 {
+    /// <summary>
+    /// test conversion to and from bytes/string.
+    /// </summary>
     [Test]
     public void Test1()
     {
@@ -19,12 +26,18 @@ public class EuidTest
 
         Console.WriteLine(checkG);
         Console.WriteLine(e);
-        Assert.That(checkStr, Is.EqualTo((string)e));
-        Assert.That(checkG, Is.EqualTo(g));
+        Assert.Multiple(() =>
+        {
+            Assert.That(checkStr, Is.EqualTo((string)e));
+            Assert.That(checkG, Is.EqualTo(g));
+        });
     }
 
     record TestData(Euid Euid);
 
+    /// <summary>
+    /// Tests json serialization
+    /// </summary>
     [Test]
     public void TestJson()
     {
@@ -42,6 +55,9 @@ public class EuidTest
         Assert.That(back, Is.EqualTo(data));
     }
 
+    /// <summary>
+    /// Test conversion to bytes
+    /// </summary>
     [Test]
     public void Test3()
     {

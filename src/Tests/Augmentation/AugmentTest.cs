@@ -1,11 +1,18 @@
 using NUnit.Framework;
 using System.Linq.Expressions;
 using System;
+using Urdep.Extensions.Augmentation;
 
-namespace Urdep.Extensions.Augmentation.Test;
+namespace Tests.Augmentation;
 
+/// <summary>
+/// Tests for augment-related stuff.
+/// </summary>
 public class AugmentTest
 {
+    /// <summary>
+    /// Test augmented struct.
+    /// </summary>
     [Test]
     public void TestAugmentedStruct()
     {
@@ -22,6 +29,9 @@ public class AugmentTest
         });
     }
 
+    /// <summary>
+    /// Augmented nullable test.
+    /// </summary>
     [Test]
     public void TestAugmentedNullableStruct()
     {
@@ -38,6 +48,9 @@ public class AugmentTest
         });
     }
 
+    /// <summary>
+    /// Augmented nullable ref test.
+    /// </summary>
     [Test]
     public void TestAugmentedNullableRef()
     {
@@ -55,6 +68,9 @@ public class AugmentTest
         });
     }
 
+    /// <summary>
+    /// Augmented not null reference test.
+    /// </summary>
     [Test]
     public void TestAugmentedNotNullRef()
     {
@@ -72,23 +88,43 @@ public class AugmentTest
         });
     }
 
+    /// <summary>
+    /// A creator of a class.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public static class Creator<T>
     {
+        /// <summary>
+        /// The expression that constructs the object.
+        /// </summary>
         public static readonly Func<T> Construct = Expression
             .Lambda<Func<T>>(Expression.New(typeof(T)))
             .Compile();
     }
 
+    /// <summary>
+    /// Non-generic creator
+    /// </summary>
     public class Creator
     {
+        /// <summary>
+        /// The instance maker
+        /// </summary>
         public readonly Func<object> Construct;
 
+        /// <summary>
+        /// Constructor for the Creator instance
+        /// </summary>
+        /// <param name="type">The type that should be created.</param>
         public Creator(Type type)
         {
             Type = type;
             Construct = Expression.Lambda<Func<object>>(Expression.New(Type)).Compile();
         }
 
+        /// <summary>
+        /// The type that this Creator instance makes.
+        /// </summary>
         public Type Type { get; }
     }
 
@@ -97,10 +133,13 @@ public class AugmentTest
         public int MyProperty { get; set; } = 0;
     }
 
+    /// <summary>
+    /// Test stack overflow example 1
+    /// https://stackoverflow.com/a/29972767
+    /// </summary>
     [Test]
     public void TestSO1()
     {
-        // https://stackoverflow.com/a/29972767
         static void DoTests(TestRec1 instance)
         {
             Assert.That(instance, Is.Not.Null);

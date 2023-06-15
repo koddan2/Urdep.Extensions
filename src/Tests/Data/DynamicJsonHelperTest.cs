@@ -1,21 +1,39 @@
 ﻿using NUnit.Framework;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Urdep.Extensions.Data;
 
-namespace Urdep.Extensions.Data.Test;
+namespace Tests.Data;
 
+/// <summary>
+/// Tests for dynamic JSON helper.
+/// </summary>
 public class DynamicJsonHelperTest
 {
+    /// <summary>
+    /// A simple record.
+    /// </summary>
+    /// <param name="Value">An int value</param>
     public record Thing1(int Value);
 
+    /// <summary>
+    /// Another simple record.
+    /// </summary>
+    /// <param name="Value">A string value</param>
     public record Thing2(string Value);
 
+    /// <summary>
+    /// The configured helper.
+    /// </summary>
     public DynamicJsonHelper Helper { get; } =
         new DynamicJsonHelper("TypeName").MapMany(
             ("Thing1", typeof(Thing1)),
             ("Thing2", typeof(Thing2))
         );
 
+    /// <summary>
+    /// A base case where the data is mapped correctly.
+    /// </summary>
     [Test]
     public void BaseCase1()
     {
@@ -24,6 +42,9 @@ public class DynamicJsonHelperTest
         Assert.That(obj!.Value, Is.EqualTo(1));
     }
 
+    /// <summary>
+    /// A base case where the data is mapped correctly.
+    /// </summary>
     [Test]
     public void BaseCase2()
     {

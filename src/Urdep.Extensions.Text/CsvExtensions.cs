@@ -3,12 +3,27 @@ using System.Linq;
 
 namespace Urdep.Extensions.Text;
 
+/// <summary>
+/// Enumeration of which side to pad.
+/// </summary>
 public enum PadSide
 {
+    /// <summary>
+    /// Pad the left side.
+    /// </summary>
     Left,
+    /// <summary>
+    /// Pad the right side.
+    /// </summary>
     Right,
 }
 
+/// <summary>
+/// A CSV column aligner.
+/// </summary>
+/// <param name="Columns">The dict of columns</param>
+/// <param name="Records">The records</param>
+/// <param name="PadSide">Which side to pad.</param>
 public record CsvColumnAligner(
     // I.e. the Header record, where keys are unchanged and values are padded.
     IDictionary<string, string> Columns,
@@ -18,12 +33,26 @@ public record CsvColumnAligner(
     PadSide PadSide
 )
 {
+    /// <summary>
+    /// Whether or not this is computed.
+    /// </summary>
     public bool Computed { get; init; }
+    /// <summary>
+    /// The widths of the columns.
+    /// </summary>
     public IDictionary<string, int>? ColumnWidths { get; init; }
 };
 
+/// <summary>
+/// CSV extensions.
+/// </summary>
 public static class CsvExtensions
 {
+    /// <summary>
+    /// Align the columns.
+    /// </summary>
+    /// <param name="csv">The CSV</param>
+    /// <returns>The aligner instance.</returns>
     public static CsvColumnAligner AlignColumns(this CsvColumnAligner csv)
     {
         if (csv.Computed)

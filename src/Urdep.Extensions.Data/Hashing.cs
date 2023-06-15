@@ -2,8 +2,16 @@
 
 namespace Urdep.Extensions.Data;
 
+/// <summary>
+/// Hashing helper.
+/// </summary>
 public static class Hashing
 {
+    /// <summary>
+    /// Gets a hash algorithm with the given name.
+    /// </summary>
+    /// <param name="algo">Which algorithm to get.</param>
+    /// <returns>The hash function.</returns>
     public static HashAlgorithm GetHashAlgorithmInstance(HashAlgo algo)
     {
         return algo switch

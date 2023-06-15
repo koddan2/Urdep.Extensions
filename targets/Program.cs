@@ -51,27 +51,43 @@ namespace targets
 
         private static class CsProj
         {
-            private static string PathToCsProj(string name) => Path.Combine(Dirs.Src, name, $"{name}.csproj");
-            public static string UrdepExtensionsAugmentation = PathToCsProj("Urdep.Extensions.Augmentation");
-            public static string UrdepExtensionsData = PathToCsProj("Urdep.Extensions.Data");
-            public static string UrdepExtensionsFileSystem = PathToCsProj("Urdep.Extensions.FileSystem");
-            public static string UrdepExtensionsText = PathToCsProj("Urdep.Extensions.Text");
+            private static string PathToLibCsProj(string name) => Path.Combine(Dirs.Src, name, $"{name}.csproj");
+            public static string UrdepExtensionsAugmentation = PathToLibCsProj("Urdep.Extensions.Augmentation");
+            public static string UrdepExtensionsData = PathToLibCsProj("Urdep.Extensions.Data");
+            public static string UrdepExtensionsFileSystem = PathToLibCsProj("Urdep.Extensions.FileSystem");
+            public static string UrdepExtensionsText = PathToLibCsProj("Urdep.Extensions.Text");
 
-            public static IEnumerable<string> All()
+            public static string Tests = PathToLibCsProj("Tests");
+
+            private static string PathToAppCsProj(string name) => Path.Combine(Dirs.Src, "Applications", name, $"{name}.csproj");
+
+            public static string TrackingCopyTool = PathToAppCsProj("TrackingCopyTool");
+            public static string Align = PathToAppCsProj("Align");
+
+            public static IEnumerable<string> AllLibraries()
             {
                 yield return UrdepExtensionsAugmentation;
                 yield return UrdepExtensionsData;
                 yield return UrdepExtensionsFileSystem;
                 yield return UrdepExtensionsText;
             }
+
+            public static IEnumerable<string> AllApplications()
+            {
+                yield return TrackingCopyTool;
+                yield return Align;
+            }
+
+            public static IEnumerable<string> All()
+            {
+                foreach (string lib in AllLibraries()) { yield return lib; }
+                foreach (string app in AllApplications()) { yield return app; }
+            }
         }
 
         static async Task Main(string[] args)
         {
-            Target(TargetNames.RestoreTools, () =>
-            {
-                Run("dotnet", "tool restore");
-            });
+            Target(TargetNames.RestoreTools, () => Run("dotnet", "tool restore"));
 
             Target(TargetNames.FormatSource, DependsOn(TargetNames.RestoreTools), async () =>
             {
@@ -91,27 +107,43 @@ namespace targets
 
             Target(TargetNames.Build, DependsOn(TargetNames.CleanBuildOutput), async () =>
             {
-                var tasks = CsProj.All().Select(csproj =>
-                    RunAsync("dotnet", $"build {csproj} -c Release --nologo")
-                );
-                await Task.WhenAll(tasks);
+                {
+                    var tasks = CsProj.AllLibraries().Select(csproj =>
+                        RunAsync("dotnet", $"build {csproj} -c Release --nologo")
+                    );
+                    await Task.WhenAll(tasks);
+                }
+
+                await RunAsync("dotnet", $"build {CsProj.Tests} -c Release --nologo");
+
+                {
+                    var tasks = CsProj.AllApplications().Select(csproj =>
+                        RunAsync("dotnet", $"build {csproj} -c Release --nologo")
+                    );
+                    await Task.WhenAll(tasks);
+                }
             });
 
             Target(TargetNames.BuildDebug, DependsOn(TargetNames.CleanBuildOutput), async () =>
             {
-                var tasks = CsProj.All().Select(csproj =>
-                    RunAsync("dotnet", $"build {csproj} -c Debug --nologo")
-                );
-                await Task.WhenAll(tasks);
+                {
+                    var tasks = CsProj.AllLibraries().Select(csproj =>
+                        RunAsync("dotnet", $"build {csproj} -c Debug --nologo")
+                    );
+                    await Task.WhenAll(tasks);
+                }
+
+                await RunAsync("dotnet", $"build {CsProj.Tests} -c Debug --nologo");
+
+                {
+                    var tasks = CsProj.AllApplications().Select(csproj =>
+                        RunAsync("dotnet", $"build {csproj} -c Debug --nologo")
+                    );
+                    await Task.WhenAll(tasks);
+                }
             });
 
-            Target(TargetNames.Test, DependsOn(TargetNames.BuildDebug), async () =>
-            {
-                var tasks = CsProj.All().Select(csproj =>
-                    RunAsync("dotnet", $"test {csproj} -c Debug --no-build --nologo")
-                );
-                await Task.WhenAll(tasks);
-            });
+            Target(TargetNames.Test, DependsOn(TargetNames.Build), async () => await RunAsync("dotnet", $"test {CsProj.Tests} -c Release --no-build --nologo"));
 
             Target(TargetNames.CleanPackOutput, () =>
             {
@@ -125,10 +157,19 @@ namespace targets
             {
                 Directory.CreateDirectory(Dirs.PackOutput);
 
-                var tasks = CsProj.All().Select(csproj =>
-                    RunAsync("dotnet", $"pack {csproj} -c Release -o {Dirs.PackOutput} --no-build --nologo --include-symbols --include-source")
-                );
-                await Task.WhenAll(tasks);
+                {
+                    var tasks = CsProj.AllLibraries().Select(csproj =>
+                        RunAsync("dotnet", $"pack {csproj} -c Release -o {Dirs.PackOutput} --no-build --nologo --include-symbols --include-source")
+                    );
+                    await Task.WhenAll(tasks);
+                }
+
+                {
+                    var tasks = CsProj.AllApplications().Select(csproj =>
+                        RunAsync("dotnet", $"publish {csproj} -c Release -o {Path.Combine(Dirs.PackOutput, Path.GetFileNameWithoutExtension(csproj))} --no-build --nologo")
+                    );
+                    await Task.WhenAll(tasks);
+                }
             });
 
             ////Target(Targets.SignPackage, DependsOn(Targets.Pack, Targets.RestoreTools), () =>

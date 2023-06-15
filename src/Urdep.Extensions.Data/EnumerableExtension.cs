@@ -2,6 +2,9 @@
 
 using System.Collections.Generic;
 
+/// <summary>
+/// Generic extension methods for IEnumerable{T} instances.
+/// </summary>
 public static class EnumerableExtension
 {
     /**

@@ -22,11 +22,4 @@
             See Urdep.Extensions.Data for usage examples.
         </Description>
     </PropertyGroup>
-
-    <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-        <PackageReference Include="NUnit.ConsoleRunner" Version="3.16.3" />
-        <PackageReference Include="NUnit" Version="3.13.3" />
-        <PackageReference Include="NUnit3TestAdapter" Version="4.3.1" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
-    </ItemGroup>
 </Project>

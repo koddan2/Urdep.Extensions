@@ -1,9 +1,16 @@
 ﻿using NUnit.Framework;
+using Urdep.Extensions.Text;
 
-namespace Urdep.Extensions.Text.Test;
+namespace Tests.Text;
 
+/// <summary>
+/// Tests for CSV extension methods.
+/// </summary>
 public class CsvExtensionsTest
 {
+    /// <summary>
+    /// A basic test of CSV extension methods.
+    /// </summary>
     [Test]
     public void TestBasic1()
     {

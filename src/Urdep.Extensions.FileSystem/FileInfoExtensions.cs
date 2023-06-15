@@ -1,7 +1,16 @@
 ﻿namespace Urdep.Extensions.FileSystem;
 
+/// <summary>
+/// Extension methods for FileInfo
+/// </summary>
 public static class FileInfoExtensions
 {
+    /// <summary>
+    /// Transform file name in place.
+    /// </summary>
+    /// <param name="fileInfo">The file info.</param>
+    /// <param name="renamer">The renamer func.</param>
+    /// <returns>The name of the file.</returns>
     public static string GetTransformedFileNameKeepParentPath(
         this FileInfo fileInfo,
         Func<string, string> renamer
