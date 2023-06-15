@@ -12,6 +12,7 @@ public enum PadSide
     /// Pad the left side.
     /// </summary>
     Left,
+
     /// <summary>
     /// Pad the right side.
     /// </summary>
@@ -37,6 +38,7 @@ public record CsvColumnAligner(
     /// Whether or not this is computed.
     /// </summary>
     public bool Computed { get; init; }
+
     /// <summary>
     /// The widths of the columns.
     /// </summary>

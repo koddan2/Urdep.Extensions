@@ -11,14 +11,17 @@ public enum TrimMode
     /// No trimming.
     /// </summary>
     None,
+
     /// <summary>
     /// Trim both ends.
     /// </summary>
     Trim,
+
     /// <summary>
     /// Trim at the start.
     /// </summary>
     TrimStart,
+
     /// <summary>
     /// Trim at the end.
     /// </summary>
