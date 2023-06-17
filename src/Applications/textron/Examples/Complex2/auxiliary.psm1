@@ -1,9 +1,44 @@
+using namespace System.IO;
+
+function Convert-ReplaceVariables {
+    param([string]$Text, [PSCustomObject]$Mappings)
+    $result = $Text
+    foreach($mapping in $Mappings.GetEnumerator()) {
+        $result = $result.Replace($mapping.Key, $mapping.Value)
+    }
+    return $result
+}
+
+Export-ModuleMember Convert-ReplaceVariables
+
+function Copy-TextByLine {
+    [CmdletBinding()]
+    param (
+        [string]$InputFile,
+        [string]$OutputFile,
+        [scriptblock]$transformer
+    )
+
+    Invoke-Using @(
+        ([StreamReader]$reader = New-Object StreamReader (Resolve-Path $InputFile))
+        ([StreamWriter]$writer = New-Object StreamWriter ([File]::OpenWrite($OutputFile)))
+    ) {
+        while (-not $reader.EndOfStream) {
+            $line = $reader.ReadLine()
+            $updatedLine = Invoke-Command -ScriptBlock $transformer -ArgumentList $line
+            if ($null -ne $updatedLine) {
+                $writer.WriteLine($updatedLine)
+            }
+        }
+    }
+}
+Export-ModuleMember Copy-TextByLine
 
 function Copy-FilteredLines {
     [CmdletBinding()]
     param (
-        [System.IO.StreamReader]$reader,
-        [System.IO.StreamWriter]$writer,
+        [string]$InputFile,
+        [string]$OutputFile,
         [PSCustomObject]$filters
     )
     
@@ -12,27 +47,31 @@ function Copy-FilteredLines {
     }
     
     process {
-        while (-not $reader.EndOfStream) {
-            $line = $reader.ReadLine()
-            if ($line.StartsWith($filters.BeginBlock)) {
-                $skipping = $true
-                continue
-            }
-            elseif ($line.StartsWith($filters.EndBlock)) {
-                $skipping = $false
-                continue
-            }
+        Invoke-Using @(
+        ([StreamReader]$reader = New-Object StreamReader (Resolve-Path $InputFile))
+        ([StreamWriter]$writer = New-Object StreamWriter ([File]::OpenWrite($OutputFile)))
+        ) {
+            while (-not $reader.EndOfStream) {
+                $line = $reader.ReadLine()
+                if ($line.StartsWith($filters.BeginBlock)) {
+                    $skipping = $true
+                    continue
+                }
+                elseif ($line.StartsWith($filters.EndBlock)) {
+                    $skipping = $false
+                    continue
+                }
 
-            if ($skipping -or [string]::IsNullOrWhiteSpace($line)) {
-                continue
-            }
+                if ($skipping -or [string]::IsNullOrWhiteSpace($line)) {
+                    continue
+                }
 
-            $writer.WriteLine($line)
+                $writer.WriteLine($line)
+            }
         }
     }
     
     end {
-        $writer.Flush()
     }
 }
 Export-ModuleMember Copy-FilteredLines

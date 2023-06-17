@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- ÅÄÖ åäö -->
-<root-element some-var="REPLACE-WITH($output-name)">
+<root-element some-var="$output-name">
     <child-element>
     <![CDATA[
     -- Not actually something important: C:
 SELECT *
 FROM my_table t
-WHERE t.some_column IN
-@p0
-
+WHERE t.some_column IN @p0
     ]]>
     </child-element>
 </root-element>

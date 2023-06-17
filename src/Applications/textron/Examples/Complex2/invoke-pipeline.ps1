@@ -16,7 +16,7 @@ begin {
     $PipelineScript = Resolve-Path -Path $PipelineScript
     if (-not (Test-Path $PipelineScript -PathType Leaf)) { $errors.Add('Parameter $PipelineScript does not point to a valid file') }
 
-    Import-Module "$PSScriptRoot\auxiliary.psm1"
+    Import-Module "$PSScriptRoot\auxiliary.psm1" -Force
 
     if ($null -eq $Settings) {
         $Settings = @{}
@@ -54,6 +54,13 @@ process {
             Workspace = $workspace
         }
         $result = Invoke-Command -ScriptBlock $step -ArgumentList $context
+        if ([string]::IsNullOrWhiteSpace($result)) {
+            Write-Error "Result is null or whitespace!"
+            break;
+        }
+        else {
+            Write-Verbose $result
+        }
     }
 }
 

@@ -1,17 +1,29 @@
 
 Add-Step {
     param($context)
-    # $context | Out-Default
-
     $target = Join-Path $context.Workspace "step1.sql"
-    Write-Verbose $target
-    Invoke-Using @(
-        ([System.IO.StreamReader]$reader = New-Object System.IO.StreamReader (Resolve-Path $context.Input))
-        ([System.IO.StreamWriter]$writer = New-Object System.IO.StreamWriter ([System.IO.File]::OpenWrite($target)))
-    ) {
-        Copy-FilteredLines $reader $writer @{
-            BeginBlock = "--[[INTERACTIVE"
-            EndBlock   = "--]]"
+    Copy-FilteredLines $context.Input $target @{
+        BeginBlock = "--[[INTERACTIVE"
+        EndBlock   = "--]]"
+    }
+
+    return $target
+}
+
+Add-Step {
+    param($context)
+    $target = Join-Path $context.Workspace "step2.sql"
+    $mappings = @{
+        'REPLACE-WITH($env:SystemDrive)' = $env:SystemDrive
+        '/*REPLACE-WITH(@p0)*/'          = '@p0'
+    }
+    Copy-TextByLine $context.Input $target {
+        param([string]$line)
+        if (-not [string]::IsNullOrWhiteSpace($line)) {
+            return (Convert-ReplaceVariables $line $mappings)
+        }
+        else {
+            return $null
         }
     }
 
@@ -20,5 +32,22 @@ Add-Step {
 
 Add-Step {
     param($context)
-    Write-Warning $context.Input
+    $target = Join-Path $context.Workspace "step3.xml"
+    $template = Get-Content "../Complex/template.xml" -Raw
+
+    $mappings = @{
+        'RENDER-HERE'                = (Get-Content $context.Input -Raw).Trim()
+        'REPLACE-WITH($output-name)' = '$output-name'
+    }
+    $result = (Convert-ReplaceVariables $template $mappings)
+    Set-Content $target $result
+
+    return $target
+}
+
+Add-Step {
+    param($context)
+    $target = Join-Path $context.Workspace $context.Settings.ResultName
+    Copy-Item $context.Input $target
+    return $target
 }
