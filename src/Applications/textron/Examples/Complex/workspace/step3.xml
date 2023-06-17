@@ -3,7 +3,12 @@
 <root-element some-var="REPLACE-WITH($output-name)">
     <child-element>
     <![CDATA[
-    RENDER-HERE
+    -- Not actually something important: C:
+SELECT *
+FROM my_table t
+WHERE t.some_column IN
+@p0
+
     ]]>
     </child-element>
 </root-element>

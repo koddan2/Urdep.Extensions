@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- ÅÄÖ åäö -->
+<root-element some-var="this is the name">
+    <child-element>
+    <![CDATA[
+    -- Not actually something important: C:
+SELECT *
+FROM my_table t
+WHERE t.some_column IN
+@p0
+
+    ]]>
+    </child-element>
+</root-element>
