@@ -63,7 +63,7 @@ public class XmlBasedTransformerPipeline : ITransformerPipeline
         await output.WriteAsync(result);
     }
 
-    private async Task<Stream> ApplyStepAsync(XElement step, Stream input)
+    private static async Task<Stream> ApplyStepAsync(XElement step, Stream input)
     {
         // TODO remove
         await ValueTask.CompletedTask;
@@ -117,7 +117,7 @@ public record FileSystemPipelineOutput : IPipelineOutput
     {
         // truncate or create file
         await File.WriteAllTextAsync(AbsolutePath, "");
-        using var outputStream = File.OpenWrite(AbsolutePath);
+        await using var outputStream = File.OpenWrite(AbsolutePath);
         await data.CopyToAsync(outputStream);
         await outputStream.FlushAsync();
     }

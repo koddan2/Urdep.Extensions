@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CleverCopy": {
+      "commandName": "Project",
+      "commandLineArgs": "--verbosity=3 --sourceDirectory=c:/temp/compress --targetDirectory=c:/temp/compress2"
+    }
+  }
+}

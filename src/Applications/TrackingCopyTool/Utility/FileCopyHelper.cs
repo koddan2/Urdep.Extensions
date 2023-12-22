@@ -6,7 +6,9 @@ namespace TrackingCopyTool.Utility
     {
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
+#pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
         static extern bool CopyFileEx(
+#pragma warning restore SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
             string lpExistingFileName,
             string lpNewFileName,
             CopyProgressRoutine lpProgressRoutine,
@@ -61,6 +63,7 @@ namespace TrackingCopyTool.Utility
             Func<long, long, long, CopyProgressCallbackReason, CopyProgressResult> cb
         )
         {
+#pragma warning disable RCS1163 // Unused parameter
             CopyProgressResult wrapper(
                 long total,
                 long transferred,
@@ -75,6 +78,7 @@ namespace TrackingCopyTool.Utility
             {
                 return cb(total, transferred, streamSize, reason);
             }
+#pragma warning restore RCS1163 // Unused parameter
             CopyFileEx(
                 sourceFile,
                 targetFile,

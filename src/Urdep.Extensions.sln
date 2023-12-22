@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleTransformer", "Applic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "textron", "Applications\textron\textron.csproj", "{ACA8ABAC-154E-4508-AA85-C22F3E755F3C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleverCopy", "Applications\CleverCopy\CleverCopy.csproj", "{378E157F-A798-47F1-B3F7-0A9576AEEA5E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,10 @@ Global
 		{ACA8ABAC-154E-4508-AA85-C22F3E755F3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ACA8ABAC-154E-4508-AA85-C22F3E755F3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ACA8ABAC-154E-4508-AA85-C22F3E755F3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{378E157F-A798-47F1-B3F7-0A9576AEEA5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{378E157F-A798-47F1-B3F7-0A9576AEEA5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{378E157F-A798-47F1-B3F7-0A9576AEEA5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{378E157F-A798-47F1-B3F7-0A9576AEEA5E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +86,7 @@ Global
 		{FEDD7402-E5A0-4752-9ECD-709644D28600} = {6ADAB69A-E1DC-491F-B935-CCB6218188AC}
 		{1E047F08-7E0E-4462-8F81-453C50DC93C7} = {6ADAB69A-E1DC-491F-B935-CCB6218188AC}
 		{ACA8ABAC-154E-4508-AA85-C22F3E755F3C} = {6ADAB69A-E1DC-491F-B935-CCB6218188AC}
+		{378E157F-A798-47F1-B3F7-0A9576AEEA5E} = {6ADAB69A-E1DC-491F-B935-CCB6218188AC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B0365066-0E78-40E3-8E57-5CD158A5D520}
