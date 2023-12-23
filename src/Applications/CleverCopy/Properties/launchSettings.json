@@ -1,8 +1,12 @@
 {
   "profiles": {
-    "CleverCopy": {
+    "CleverCopy - help": {
       "commandName": "Project",
-      "commandLineArgs": "--verbosity=3 --sourceDirectory=c:/temp/compress --targetDirectory=c:/temp/compress2"
+      "commandLineArgs": ""
+    },
+    "CleverCopy - default": {
+      "commandName": "Project",
+      "commandLineArgs": "--verbosity=Information --sourceDirectory=c:/temp/compress --targetDirectory=c:/temp/compress2 --excludeGlobs:0=*gz"
     }
   }
 }

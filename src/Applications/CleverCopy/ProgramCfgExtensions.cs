@@ -25,4 +25,7 @@ internal static class ProgramCfgExtensions
 
     public static string GetSourceDirectoryCleverCopyDirectory(this ProgramCfg cfg)
         => Path.Combine(cfg.SourceDirectory, cfg.CleverCopyDirectoryName);
+
+    public static string GetTargetDirectoryCleverCopyDirectory(this ProgramCfg cfg)
+        => Path.Combine(cfg.TargetDirectory, cfg.CleverCopyDirectoryName);
 }

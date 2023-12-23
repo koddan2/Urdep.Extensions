@@ -1,23 +1,64 @@
 ﻿namespace CleverCopy;
 
 /// <summary>
+/// Different levels of logging.
+/// </summary>
+public enum VerbosityLevel
+{
+    /// <summary>
+    /// Completely silent, like a ninja.
+    /// </summary>
+    Silent = -1,
+
+    /// <summary>
+    /// Terminating errors or other such conditions.
+    /// </summary>
+    Fatal = 0,
+
+    /// <summary>
+    /// Something is wrong enough that the program will not work as intended.
+    /// </summary>
+    Error,
+
+    /// <summary>
+    /// The program is unsure whether something might be bad. But it might.
+    /// </summary>
+    Warning,
+
+    /// <summary>
+    /// Messages that should relay noteworthy content.
+    /// </summary>
+    Information,
+
+    /// <summary>
+    /// In order to better understand what is actually happening, without flooding the interface.
+    /// </summary>
+    Debug,
+
+    /// <summary>
+    /// Everything and anything.
+    /// </summary>
+    Verbose,
+}
+
+/// <summary>
 /// This type describes the configuration that this program can handle.
 /// </summary>
 public record ProgramCfg
 {
     /// <summary>
     /// Determines how verbose this program is.
-    /// A setting of <c>0</c> disables all output.
-    /// A setting of <c>1</c> disables all stdout output and will only write to stderr.
-    /// A setting of <c>2</c> enables the most basic info on stdout (writes to stderr as usual).
-    /// A setting of <c>3+</c> enables more verbose info on stdout (writes to stderr as usual).
+    /// <list type="bullet">
+    /// <item>A setting of <c>-1</c> disables all output.</item>
+    /// <item>A setting of <c>0</c> will write only fatal errors to stderr.</item>
+    /// <item>A setting of <c>1</c> will only write errors and fatal messages to stderr.</item>
+    /// <item>A setting of <c>2</c> will only write warnings, errors and fatal messages to stderr.</item>
+    /// <item>A setting of <c>3</c> will only write informational messages, warnings, errors and fatal messages to stderr.</item>
+    /// <item>A setting of <c>4</c> will only write debug messages, informational messages, warnings, errors and fatal messages to stderr.</item>
+    /// <item>A setting of <c>5+</c> enables all output to stderr.</item>
+    /// </list>
     /// </summary>
-    public int Verbosity { get; init; } = 1;
-
-    /// <summary>
-    /// If this is set to true, the program will try to create the target directory.
-    /// </summary>
-    public bool Force { get; init; } = false;
+    public VerbosityLevel Verbosity { get; init; } = VerbosityLevel.Information;
 
     /// <summary>
     /// The name of the directory in which this program stores its own data.

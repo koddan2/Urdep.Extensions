@@ -16,6 +16,46 @@
             <param name="args">The command line arguments.</param>
             <returns>An integer (exit code), where zero means success, and any other value means something failed.</returns>
         </member>
+        <member name="T:CleverCopy.VerbosityLevel">
+            <summary>
+            Different levels of logging.
+            </summary>
+        </member>
+        <member name="F:CleverCopy.VerbosityLevel.Silent">
+            <summary>
+            Completely silent, like a ninja.
+            </summary>
+        </member>
+        <member name="F:CleverCopy.VerbosityLevel.Fatal">
+            <summary>
+            Terminating errors or other such conditions.
+            </summary>
+        </member>
+        <member name="F:CleverCopy.VerbosityLevel.Error">
+            <summary>
+            Something is wrong enough that the program will not work as intended.
+            </summary>
+        </member>
+        <member name="F:CleverCopy.VerbosityLevel.Warning">
+            <summary>
+            The program is unsure whether something might be bad. But it might.
+            </summary>
+        </member>
+        <member name="F:CleverCopy.VerbosityLevel.Information">
+            <summary>
+            Messages that should relay noteworthy content.
+            </summary>
+        </member>
+        <member name="F:CleverCopy.VerbosityLevel.Debug">
+            <summary>
+            In order to better understand what is actually happening, without flooding the interface.
+            </summary>
+        </member>
+        <member name="F:CleverCopy.VerbosityLevel.Verbose">
+            <summary>
+            Everything and anything.
+            </summary>
+        </member>
         <member name="T:CleverCopy.ProgramCfg">
             <summary>
             This type describes the configuration that this program can handle.
@@ -24,15 +64,15 @@
         <member name="P:CleverCopy.ProgramCfg.Verbosity">
             <summary>
             Determines how verbose this program is.
-            A setting of <c>0</c> disables all output.
-            A setting of <c>1</c> disables all stdout output and will only write to stderr.
-            A setting of <c>2</c> enables the most basic info on stdout (writes to stderr as usual).
-            A setting of <c>3+</c> enables more verbose info on stdout (writes to stderr as usual).
-            </summary>
-        </member>
-        <member name="P:CleverCopy.ProgramCfg.Force">
-            <summary>
-            If this is set to true, the program will try to create the target directory.
+            <list type="bullet">
+            <item>A setting of <c>-1</c> disables all output.</item>
+            <item>A setting of <c>0</c> will write only fatal errors to stderr.</item>
+            <item>A setting of <c>1</c> will only write errors and fatal messages to stderr.</item>
+            <item>A setting of <c>2</c> will only write warnings, errors and fatal messages to stderr.</item>
+            <item>A setting of <c>3</c> will only write informational messages, warnings, errors and fatal messages to stderr.</item>
+            <item>A setting of <c>4</c> will only write debug messages, informational messages, warnings, errors and fatal messages to stderr.</item>
+            <item>A setting of <c>5+</c> enables all output to stderr.</item>
+            </list>
             </summary>
         </member>
         <member name="P:CleverCopy.ProgramCfg.CleverCopyDirectoryName">

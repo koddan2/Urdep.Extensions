@@ -1,5 +1,5 @@
 
-# TrackingCopyTool
+# CleverCopy
 
 Tries to be smart about what to copy.
 
@@ -13,15 +13,9 @@ Copy all files that
 - to `//maybe/c$/some/unc` (creating the target dir(s) if they do not exist.)
 
 ```powershell
-TrackingCopyTool.exe -d c:/my/dir/somewhere --includes:0 **/*.* --excludes:0 **/*.dump --target:name //maybe/some/unc --target:create true
+CleverCopy.exe --SourceDirectory=c:/my/dir/somewhere --IncludeGlobs:0 **/*.* --ExcludeGlobs:0 **/*.dump --TargetDirectory //maybe/some/unc
 ```
+
+Pass `--Verbosity=X` to control how much stuff is reported. Ranges from -1 to 5, where lower means less.
 
 ----
-
-Passing `--force true` to the invocation will
-a. create directories that does not exist
-b. copy all files, disregarding the target manifest
-
-```powershell
-TrackingCopyTool.exe -d c:/my/dir/somewhere --includes:0 **/*.* --target:name c:/target-dir --force true
-```
