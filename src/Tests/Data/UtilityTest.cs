@@ -23,7 +23,7 @@ public class UtilityTest
         var message = GetValue(arr).Here(out var result, "TEST");
         Assert.Multiple(() =>
         {
-            Assert.That(message, Does.StartWith("<String>[GetValue(arr)] 'TEST'"));
+            Assert.That(message, Does.StartWith("[String GetValue(arr)] 'TEST'"));
             Assert.That(result, Is.EqualTo(arr[0]));
         });
     }
