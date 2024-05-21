@@ -1,18 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    "net6.0": {
-      "Base62-Net": {
-        "type": "Direct",
-        "requested": "[1.2.157201, )",
-        "resolved": "1.2.157201",
-        "contentHash": "PT956Yciz8tDURLoItPcsWGmXgHLSd+ezkO1Hx+1nfUcv407sNkN3RKOJr0Yas76rC8UzSmNL0OIBuTh8CompA=="
-      },
-      "urdep.extensions.augmentation": {
-        "type": "Project"
-      }
-    },
-    "net7.0": {
+    "net8.0": {
       "Base62-Net": {
         "type": "Direct",
         "requested": "[1.2.157201, )",

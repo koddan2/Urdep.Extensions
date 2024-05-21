@@ -2,7 +2,7 @@
     <Import Project="$(MSBuildThisFileDirectory)..\Shared.build.props" />
     <PropertyGroup>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+        <TargetFrameworks>net8.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <Version>0.3.0</Version>
@@ -15,6 +15,12 @@
             Utility functions for handling data, such as transforming POCOs to Dictionaries etc.
         </Description>
     </PropertyGroup>
+    <ItemGroup>
+      <None Remove="SqlStuff.cs.txt" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Include="SqlStuff.cs.txt" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Base62-Net" Version="1.2.157201" />

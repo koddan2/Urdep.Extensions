@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Linq;
-
-namespace Urdep.Extensions.Text;
+﻿namespace Urdep.Extensions.Text;
 
 /// <summary>
 /// Enumeration of which side to pad.
@@ -85,7 +82,7 @@ public static class CsvExtensions
             columnWidths = csv.ColumnWidths;
         }
 
-        DoAlignment(csv, columns, new[] { csv.Columns }, columnWidths);
+        DoAlignment(csv, columns, [csv.Columns], columnWidths);
         DoAlignment(csv, columns, records, columnWidths);
 
         return csv with

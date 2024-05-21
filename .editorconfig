@@ -50,3 +50,7 @@ dotnet_naming_rule.private_static_fields_must_begin_with_underscore_and_be_in_ca
 
 dotnet_diagnostic.CS8509.severity = error # missing switch case for named enum value
 dotnet_diagnostic.CS8524.severity = none # missing switch case for unnamed enum value
+
+dotnet_diagnostic.IDE0005.severity = error
+dotnet_diagnostic.IDE0290.severity = none
+dotnet_diagnostic.RCS1089.severity = none

@@ -1,5 +1,3 @@
-using System;
-
 namespace Urdep.Extensions.Augmentation
 {
     /// <summary>

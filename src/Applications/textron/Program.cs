@@ -7,9 +7,9 @@ public static class Program
     public static async Task<int> Main(string[] args)
     {
         string[] helpArgs =
-        {
+        [
             "help", "?", "-h", "--help"
-        };
+        ];
         if (args.Length != 1)
         {
             PrintHelp();

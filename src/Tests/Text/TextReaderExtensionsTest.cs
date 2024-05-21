@@ -1,5 +1,4 @@
-﻿using NUnit.Framework;
-using System.Text;
+﻿using System.Text;
 using Urdep.Extensions.Text;
 
 namespace Tests.Text;

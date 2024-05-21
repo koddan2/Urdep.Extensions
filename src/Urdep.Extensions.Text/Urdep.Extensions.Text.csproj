@@ -2,7 +2,7 @@
     <Import Project="$(MSBuildThisFileDirectory)..\Shared.build.props" />
     <PropertyGroup>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+        <TargetFrameworks>net8.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <Version>0.2.0</Version>

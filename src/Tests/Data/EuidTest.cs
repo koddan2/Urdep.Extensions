@@ -1,6 +1,4 @@
-﻿using NUnit.Framework;
-using System.Text.Json;
-using Urdep.Extensions.Data;
+﻿using Urdep.Extensions.Data;
 
 namespace Tests.Data;
 

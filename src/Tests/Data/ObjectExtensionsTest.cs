@@ -1,7 +1,5 @@
-﻿using NUnit.Framework;
-using Urdep.Extensions.Augmentation;
+﻿using Urdep.Extensions.Augmentation;
 using Urdep.Extensions.Data;
-using Urdep.Extensions.Data.Utility;
 
 namespace Tests.Data;
 
@@ -19,14 +17,17 @@ public class ObjectExtensionsTest
         /// an int value
         /// </summary>
         public int IntValue { get; set; }
+
         /// <summary>
         /// a string value
         /// </summary>
         public string? StrValue { get; set; }
+
         /// <summary>
         /// a bool value
         /// </summary>
         public bool BoolValue { get; set; }
+
         /// <summary>
         /// a reference value
         /// </summary>

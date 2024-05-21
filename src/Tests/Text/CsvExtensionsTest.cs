@@ -1,5 +1,4 @@
-﻿using NUnit.Framework;
-using Urdep.Extensions.Text;
+﻿using Urdep.Extensions.Text;
 
 namespace Tests.Text;
 
@@ -15,7 +14,7 @@ public class CsvExtensionsTest
     public void TestBasic1()
     {
         var keys = new string[] { "A", "B", "C" };
-        var recordsData = new string[][] { new string[] { "12", "123", "1234" }, };
+        var recordsData = new string[][] { ["12", "123", "1234"], };
 
         var columns = keys.ToDictionary(k => k, k => k);
         var records = recordsData.Select(record => MakeDictionary(record, keys));

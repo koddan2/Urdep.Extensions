@@ -32,6 +32,8 @@ internal static class Values
 
 internal static class Optional
 {
+    internal static readonly string[] separator = [","];
+
     public static ICollection<string> Csv(
         IConfiguration conf,
         string key,
@@ -39,10 +41,10 @@ internal static class Optional
     )
     {
         var val = conf[key];
-        List<string> result = new();
+        List<string> result = [];
         if (!string.IsNullOrEmpty(val))
         {
-            result.AddRange(val.Split(new[] { "," }, StringSplitOptions.TrimEntries));
+            result.AddRange(val.Split(separator, StringSplitOptions.TrimEntries));
         }
 
         return transformer(result);
@@ -112,10 +114,9 @@ internal static class ArgsExt
 {
     public static bool IsDefined(this Args args, string a)
     {
-        var upper = a.ToUpper();
         for (int i = 0; i < args.Arguments.Length; i++)
         {
-            if (args.Arguments[i].ToUpper() == upper)
+            if (args.Arguments[i].Equals(a, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
@@ -144,11 +145,11 @@ internal class ProgramCfg
     /// <returns>The supplied values or the default ones, if none are supplied.</returns>
     ICollection<string> DefaultIncludesTransform(ICollection<string> values)
     {
-        if (values.Any())
+        if (values.Count != 0)
         {
             return values.Where(x => !string.IsNullOrEmpty(x)).ToList();
         }
-        return new[] { "**/*.*" };
+        return ["**/*.*"];
     }
 
     /// <summary>
@@ -175,7 +176,7 @@ internal class ProgramCfg
     /// <returns>The new values which excludes the tool's private directory.</returns>
     ICollection<string> DefaultExcludesTransform(ICollection<string> values)
     {
-        return values.Concat(new[] { Path.Combine(PrivateDirectoryName, "**") }).ToList();
+        return [.. values, .. new[] { Path.Combine(PrivateDirectoryName, "**") }];
     }
 
     /// <summary>

@@ -35,8 +35,8 @@ internal class ApplicationIo
     public TextWriter ErrWriter { get; } = Console.Error;
 
     public void Out(string msg, params object?[]? args)
-        => _stdout.Write(msg, args ?? Array.Empty<string>());
+        => _stdout.Write(msg, args ?? []);
 
     public void ErrLine(string msg, params object?[]? args)
-        => ErrWriter.WriteLine(msg, args ?? Array.Empty<string>());
+        => ErrWriter.WriteLine(msg, args ?? []);
 }

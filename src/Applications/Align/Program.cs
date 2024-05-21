@@ -149,7 +149,7 @@ internal static class Program
 
     private static void Default<T>(ICollection<T> argument, Func<T> value)
     {
-        if (!argument.Any())
+        if (argument.Count == 0)
         {
             argument.Add(value());
         }
@@ -157,7 +157,7 @@ internal static class Program
 
     private static string RequiredArgument(string[] args, int i, string name)
     {
-        if (args.Length + 1 < i || args[i].StartsWith("-"))
+        if (args.Length + 1 < i || args[i].StartsWith('-'))
         {
             throw new ApplicationException(
                 $"Invalid command line: argument {name} requires a value"

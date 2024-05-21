@@ -40,16 +40,5 @@
         /// <param name="inner">The inner exception</param>
         public InvariantFailedException(string message, Exception inner)
             : base(message, inner) { }
-
-        /// <summary>
-        /// Protected constructor for serialization purposes.
-        /// </summary>
-        /// <param name="info">The info</param>
-        /// <param name="context">The context</param>
-        protected InvariantFailedException(
-            System.Runtime.Serialization.SerializationInfo info,
-            System.Runtime.Serialization.StreamingContext context
-        )
-            : base(info, context) { }
     }
 }

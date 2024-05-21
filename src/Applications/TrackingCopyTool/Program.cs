@@ -45,8 +45,7 @@ internal static class Program
                 var target = Path.GetFullPath(args[1]);
                 var targetPriv = Path.Combine(target, ProgramCfg.PrivateDirectoryName);
                 return InnerMain(
-                    new[]
-                    {
+                    [
                         "-d",
                         assemblyLoc,
                         "--target:create",
@@ -55,7 +54,7 @@ internal static class Program
                         targetPriv,
                         "-v",
                         "2"
-                    }
+                    ]
                 );
             }
             else
@@ -141,7 +140,7 @@ internal static class Program
         if (cfg.OnlyValidateFiles)
         {
             var readManifest = ReadManifest(cfg.ManifestFileFullPathSource, cfg);
-            List<string> errors = new();
+            List<string> errors = [];
             foreach (var item in hashesDict)
             {
                 if (readManifest.TryGetValue(item.Key, out string? value))
@@ -159,7 +158,7 @@ internal static class Program
             }
 
             Console.WriteLine("CMD: {0}", Environment.CommandLine);
-            if (errors.Any())
+            if (errors.Count != 0)
             {
                 foreach (var error in errors)
                 {
@@ -198,7 +197,7 @@ internal static class Program
             && File.Exists(cfg.RestartManifestFileFullPathTarget)
         )
         {
-            targetHashes ??= new Dictionary<string, string>();
+            targetHashes ??= [];
 
             var extraHashes = ReadManifest(cfg.RestartManifestFileFullPathTarget, cfg);
             foreach (var kvp in extraHashes)
@@ -377,7 +376,7 @@ ERR: - and the paths and hashes are separated by '{cfg.PathHashSeparator}'"
         HashAlgorithm hashAlgo
     )
     {
-        HashSet<PathHashPair> hashes = new();
+        HashSet<PathHashPair> hashes = [];
         foreach (var path in paths)
         {
             var relPath = Path.GetRelativePath(baseDir, path);
@@ -398,7 +397,7 @@ ERR: - and the paths and hashes are separated by '{cfg.PathHashSeparator}'"
         IEnumerable<string> paths
     )
     {
-        HashSet<PathHashPair> hashes = new();
+        HashSet<PathHashPair> hashes = [];
         foreach (var path in paths)
         {
             var relPath = Path.GetRelativePath(baseDir, path);

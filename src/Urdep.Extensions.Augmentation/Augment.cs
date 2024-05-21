@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Urdep.Extensions.Augmentation
+﻿namespace Urdep.Extensions.Augmentation
 {
     /// <summary>
     /// Augment helper methods.

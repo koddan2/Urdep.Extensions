@@ -1,6 +1,4 @@
-﻿using NUnit.Framework;
-using System;
-using Urdep.Extensions.Data.Utility;
+﻿using Urdep.Extensions.Data.Utility;
 
 namespace Tests.Data;
 

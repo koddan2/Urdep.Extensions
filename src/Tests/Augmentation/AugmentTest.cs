@@ -1,6 +1,4 @@
-using NUnit.Framework;
 using System.Linq.Expressions;
-using System;
 using Urdep.Extensions.Augmentation;
 
 namespace Tests.Augmentation;
@@ -58,13 +56,11 @@ public class AugmentTest
 
         Assert.Multiple(() =>
         {
-            var a1 = Augment.Ref(i);
-#pragma warning disable IDE0150 // Prefer 'null' check over type check
-            Assert.That(a1 is AugmentedRef<object>, Is.True);
-#pragma warning restore IDE0150 // Prefer 'null' check over type check
+            AugmentedRef<object> a1 = Augment.Ref(i);
+            Assert.That(a1, Is.Not.Null);
             var a2 = Augment.Ref(i);
             Assert.That(a1, Is.EqualTo(a2));
-            Assert.That(a1 is IAugmented<object>, Is.True);
+            Assert.That(a1 is IAugmented<object>);
         });
     }
 
@@ -79,9 +75,7 @@ public class AugmentTest
         Assert.Multiple(() =>
         {
             var a1 = Augment.NotNull(i);
-#pragma warning disable IDE0150 // Prefer 'null' check over type check
-            Assert.That(a1 is AugmentedNotNull<object>, Is.True);
-#pragma warning restore IDE0150 // Prefer 'null' check over type check
+            Assert.That(a1.GetType(), Is.EqualTo(typeof(AugmentedNotNull<object>)));
             var a2 = Augment.NotNull(i);
             Assert.That(a1, Is.EqualTo(a2));
             Assert.That(a1 is IAugmented<object>, Is.True);
@@ -130,7 +124,14 @@ public class AugmentTest
 
     record TestRec1
     {
-        public int MyProperty { get; set; } = 0;
+        public TestRec1()
+        {
+            MyProperty2 = 99;
+        }
+
+        public int MyProperty { get; set; } = 4;
+
+        public int MyProperty2 { get; set; }
     }
 
     /// <summary>
