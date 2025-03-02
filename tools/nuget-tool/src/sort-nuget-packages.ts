@@ -3,10 +3,12 @@ import { JSDOM } from "jsdom";
 import prettier from "prettier";
 import prettierPluginXml from "@prettier/plugin-xml";
 
-const xmlFilePath = process.argv[2];
-
-// Read the XML file
-async function sortNugetPackages() {
+/**
+ * This function lexographically sorts all the PackageReference elements in the given XML file by their Include attribute.
+ * @param xmlFilePath the path to the xml file
+ * @returns a promise that resolves when the elements in the file has been sorted
+ */
+export async function sortNugetPackages(xmlFilePath: string): Promise<void> {
   try {
     const xmlBuffer = await fs.promises.readFile(xmlFilePath);
     const xml = xmlBuffer.toString("utf-8");
@@ -19,7 +21,7 @@ async function sortNugetPackages() {
     for (const itemGroup of itemGroups) {
       // Get all child nodes with Include attributes (like PackageReference, ProjectReference, etc.)
       const children = Array.from(itemGroup.children).filter((node) =>
-        node.hasAttribute("Include"),
+        node.hasAttribute("Include")
       );
 
       if (children.length <= 1) continue; // No need to sort if there's only one or zero elements
@@ -60,7 +62,7 @@ async function sortNugetPackages() {
       const contentBuffer = Buffer.from(textToSave, "utf8");
       await fs.promises.writeFile(
         xmlFilePath,
-        Buffer.concat([bomBuffer, contentBuffer]),
+        Buffer.concat([bomBuffer, contentBuffer])
       );
     } else {
       // pretty print the XML using prettier and the plugin for XML
@@ -78,8 +80,3 @@ async function sortNugetPackages() {
     console.error(`Error processing ${xmlFilePath}:`, error);
   }
 }
-
-sortNugetPackages().catch((err) => {
-  console.error("Fatal error:", err);
-  process.exit(1);
-});

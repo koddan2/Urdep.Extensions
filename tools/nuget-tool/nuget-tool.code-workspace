@@ -1,10 +1,12 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
-		"editor.formatOnSave": true
-	}
+  "folders": [
+    {
+      "path": ".",
+    },
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+    "mochaExplorer.files": "**/*.test.ts",
+    "mochaExplorer.require": "tsx",
+  },
 }

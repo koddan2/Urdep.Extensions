@@ -1,12 +1,13 @@
 import fs from "fs";
 import path from "path";
+import { mockable } from "@atcodes/mockable";
 
 /**
  * Recursively find all .csproj files in the given directory
  * @param dir Directory to search in
  * @returns Array of absolute paths to .csproj files
  */
-export async function findCsprojFiles(dir: string): Promise<string[]> {
+async function _findCsprojFiles(dir: string): Promise<string[]> {
   const results: string[] = [];
 
   async function scan(directory: string) {
@@ -32,3 +33,5 @@ export async function findCsprojFiles(dir: string): Promise<string[]> {
   await scan(dir);
   return results;
 }
+
+export const findCsprojFiles = mockable(_findCsprojFiles);
