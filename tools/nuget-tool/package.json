@@ -1,7 +1,7 @@
 {
   "name": "nuget-tool",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": "main.ts",
   "scripts": {
     "test": "mocha -r tsx src/**/*.test.ts",
     "build": "tsc"

@@ -78,5 +78,6 @@ export async function sortNugetPackages(xmlFilePath: string): Promise<void> {
     console.log(`Package references in ${xmlFilePath} have been sorted.`);
   } catch (error) {
     console.error(`Error processing ${xmlFilePath}:`, error);
+    throw error;
   }
 }
