@@ -1,0 +1,24 @@
+{
+  "name": "nuget-tool",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "author": "",
+  "description": "",
+  "dependencies": {
+    "jsdom": "^26.0.0",
+    "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "@prettier/plugin-xml": "^3.4.1",
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "^22.13.5",
+    "@types/xml2js": "^0.4.14",
+    "prettier": "^3.5.2",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.3"
+  }
+}
