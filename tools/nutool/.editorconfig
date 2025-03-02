@@ -1,0 +1,5 @@
+
+[*.cs]
+# Id 	Category 	Description 	Severity 	Is enabled 	Code fix
+# MA0004 	Usage 	Use Task.ConfigureAwait 	⚠️ 	✔️ 	✔️
+dotnet_diagnostic.MA0004.severity = silent

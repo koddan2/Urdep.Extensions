@@ -1,0 +1,10 @@
+﻿<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Meziantou.Analyzer" Version="2.0.188" />
+    <PackageVersion Include="Roslynator.Core" Version="4.13.1" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.7.0.110445" />
+  </ItemGroup>
+</Project>
