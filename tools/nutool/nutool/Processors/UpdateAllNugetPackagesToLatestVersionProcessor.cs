@@ -65,56 +65,76 @@ internal static class UpdateAllNugetPackagesToLatestVersionProcessor
         var xml = await File.ReadAllTextAsync(target, cancellationToken);
         var xDocument = XDocument.Parse(xml);
         var versionElements = xDocument.Descendants("PackageVersion");
+
+        var tasks = new List<Task>();
         foreach (var versionElement in versionElements)
         {
-            var pkgName = versionElement.Attribute("Include")?.Value;
-            if (pkgName == null)
-            {
-                continue;
-            }
-
-            logger.LogInformation("Processing package {Package}", pkgName);
-
-            var metadata = await pkgMetadataResource.GetMetadataAsync(
-                pkgName,
-                includePrerelease: false,
-                includeUnlisted: false,
-                _SourceCacheContext,
-                new CustomLogger(logger),
+            var task = ProcessPackageVersion(
+                logger,
+                pkgMetadataResource,
+                versionElement,
                 cancellationToken
             );
+            tasks.Add(task);
+        }
 
-            var ordered = metadata.OrderBy(p => p.Identity.Version, VersionComparer.Default);
-            if (ordered.Any())
+        await Task.WhenAll(tasks);
+
+        return xDocument;
+    }
+
+    private static async Task ProcessPackageVersion(
+        Microsoft.Extensions.Logging.ILogger logger,
+        PackageMetadataResource pkgMetadataResource,
+        XElement versionElement,
+        CancellationToken cancellationToken
+    )
+    {
+        var pkgName = versionElement.Attribute("Include")?.Value;
+        if (pkgName == null)
+        {
+            return;
+        }
+
+        logger.LogInformation("Processing package {Package}", pkgName);
+
+        var metadata = await pkgMetadataResource.GetMetadataAsync(
+            pkgName,
+            includePrerelease: false,
+            includeUnlisted: false,
+            _SourceCacheContext,
+            new CustomLogger(logger),
+            cancellationToken
+        );
+
+        var ordered = metadata.OrderBy(p => p.Identity.Version, VersionComparer.Default);
+        if (ordered.Any())
+        {
+            var latestVersion = ordered.Last().Identity.Version;
+            var versionAttr = versionElement.Attribute("Version")!;
+            if (NuGetVersion.TryParse(versionAttr.Value, out var currentVersion))
             {
-                var latestVersion = ordered.Last().Identity.Version;
-                var versionAttr = versionElement.Attribute("Version")!;
-                if (NuGetVersion.TryParse(versionAttr.Value, out var currentVersion))
+                if (currentVersion < latestVersion)
                 {
-                    if (currentVersion < latestVersion)
-                    {
-                        versionAttr.Value = latestVersion.ToNormalizedString();
-                    }
-                    else
-                    {
-                        logger.LogInformation(
-                            "Package {Package} is already at the latest version",
-                            pkgName
-                        );
-                    }
+                    versionAttr.Value = latestVersion.ToNormalizedString();
                 }
                 else
                 {
-                    logger.LogWarning(
-                        "Could not parse version attribute value '{Version}' for package '{Package}'",
-                        versionAttr.Value,
+                    logger.LogInformation(
+                        "Package {Package} is already at the latest version",
                         pkgName
                     );
                 }
             }
+            else
+            {
+                logger.LogWarning(
+                    "Could not parse version attribute value '{Version}' for package '{Package}'",
+                    versionAttr.Value,
+                    pkgName
+                );
+            }
         }
-
-        return xDocument;
     }
 
     private sealed class CustomLogger : NuGet.Common.ILogger
