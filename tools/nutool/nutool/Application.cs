@@ -18,6 +18,10 @@ internal static class Application
                 return await ExtractPackagesProcessor.RunAsync(cancellationToken);
             case SubCommand.ChangeTargetFramework:
                 return await ChangeTargetFrameworkProcessor.RunAsync(cancellationToken);
+            case SubCommand.SetPackageVersionsToLatest:
+                return await UpdateAllNugetPackagesToLatestVersionProcessor.RunAsync(
+                    cancellationToken
+                );
             default:
                 await PrintHelpAsync();
                 return 1;

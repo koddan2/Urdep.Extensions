@@ -29,4 +29,9 @@ public enum SubCommand
     /// Sorts the package versions in MSBuild files.
     /// </summary>
     SortPackageVersions,
+
+    /// <summary>
+    /// Updates all NuGet package versions to the latest version.
+    /// </summary>
+    SetPackageVersionsToLatest,
 }

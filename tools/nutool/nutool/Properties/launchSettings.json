@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "nutool:SetPackageVersionsToLatest": {
+        "commandName": "Project",
+        "commandLineArgs": "SetPackageVersionsToLatest --target C:/CODE/Urdep.Extensions/tools/nutool/Directory.packages.props"
+    }
+  }
+}
