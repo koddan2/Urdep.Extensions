@@ -1,52 +1,49 @@
 using System.Xml;
 using System.Xml.Linq;
 
-namespace nutool;
+namespace nutool.Processors;
 
-internal static class Application
+internal static class ExtractPackagesProcessor
 {
-    public static ArgsParser Args { get; private set; } = null!;
-
-    public sealed record NugetPackage(string Name, string Version);
-
-    internal static Task<int> RunAsync(string[] args, CancellationToken cancellationToken)
+    internal static async Task<int> RunAsync(CancellationToken cancellationToken)
     {
-        Args = new ArgsParser(args);
-
-        var subCommand = Args.GetSubCommand();
-
-        switch (subCommand)
-        {
-            case "extract-packages":
-                return ExtractPackagesAsync(cancellationToken);
-            default:
-                throw new NutoolException($"Unknown subcommand: {subCommand}");
-        }
-    }
-
-    private static async Task<int> ExtractPackagesAsync(CancellationToken cancellationToken)
-    {
-        var rootPath = Args.GetArgumentValue("root");
-        var outfile = Args.GetArgumentValue("out");
+        var rootPath = Application.Args.GetArgumentValue("root");
+        var outfile = Application.Args.GetArgumentValue("out");
         var csProjFiles = Utilities.GetAllPathsToCsProjFilesRecursively(rootPath);
-        var packages = new HashSet<NugetPackage>();
+        var packages = new HashSet<PackageVersion>();
         foreach (var csProjFile in csProjFiles)
         {
             var xml = await File.ReadAllTextAsync(csProjFile, cancellationToken);
-            var xDocument =  XDocument.Parse(xml);
+            var xDocument = XDocument.Parse(xml);
 
-            // for each PackageReference element in the xDocument file, extract the package name and version
             var packageReferences = xDocument.Descendants("PackageReference");
             foreach (var packageReference in packageReferences)
             {
                 var packageName = packageReference.Attribute("Include")?.Value;
                 var packageVersion = packageReference.Attribute("Version")?.Value;
-                //// Console.WriteLine($"{packageName} {packageVersion}");
-                packages.Add(new NugetPackage(packageName!, packageVersion!));
+                packages.Add(new PackageVersion(packageName!, packageVersion!));
             }
         }
 
-        packages = [.. packages.OrderBy(p => p.Name, StringComparer.OrdinalIgnoreCase)];
+        packages = [.. packages.OrderBy(p => p.Include, StringComparer.OrdinalIgnoreCase)];
+
+        // make sure that only the latest version of each package is included
+        var latestPackages = new HashSet<PackageVersion>();
+        foreach (var package in packages)
+        {
+            if (
+                latestPackages.Any(p =>
+                    string.Equals(p.Include, package.Include, StringComparison.Ordinal)
+                )
+            )
+            {
+                continue;
+            }
+
+            latestPackages.Add(package);
+        }
+
+        packages = latestPackages;
 
         var xdoc = new XDocument();
         var rootElement = new XElement("Project");
@@ -62,7 +59,7 @@ internal static class Application
         foreach (var package in packages)
         {
             var element = new XElement("PackageVersion");
-            element.SetAttributeValue("Include", package.Name);
+            element.SetAttributeValue("Include", package.Include);
             element.SetAttributeValue("Version", package.Version);
             itemGroupElement.Add(element);
         }

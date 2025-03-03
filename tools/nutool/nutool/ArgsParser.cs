@@ -24,9 +24,19 @@ internal class ArgsParser
         throw new NutoolException($"Argument not found: {argName}");
     }
 
-    internal string GetSubCommand()
+    internal SubCommand GetSubCommand()
     {
-        // return the first argument
-        return _args[0];
+        if (_args.Length == 0)
+        {
+            return default;
+        }
+        else if (Enum.TryParse<SubCommand>(_args[0], true, out var subCommand))
+        {
+            return subCommand;
+        }
+        else
+        {
+            return default;
+        }
     }
 }
