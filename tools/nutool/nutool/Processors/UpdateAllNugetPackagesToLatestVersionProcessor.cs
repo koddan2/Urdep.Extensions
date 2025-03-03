@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.Xml;
+using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using NuGet.Common;
 using NuGet.Protocol;
@@ -25,7 +26,20 @@ internal static class UpdateAllNugetPackagesToLatestVersionProcessor
             return 1;
         }
 
-        await ProcessAllPackageVersionElementsIn(target, cancellationToken);
+        var xdoc = await ProcessAllPackageVersionElementsIn(target, cancellationToken);
+
+        // save xdoc to target
+        await using var xmlWriter = XmlWriter.Create(
+            target,
+            new XmlWriterSettings
+            {
+                Indent = true,
+                Async = true,
+                OmitXmlDeclaration = true,
+            }
+        );
+
+        await xdoc.SaveAsync(xmlWriter, cancellationToken);
 
         return 0;
     }
@@ -37,7 +51,7 @@ internal static class UpdateAllNugetPackagesToLatestVersionProcessor
         );
     }
 
-    private static async Task ProcessAllPackageVersionElementsIn(
+    private static async Task<XDocument> ProcessAllPackageVersionElementsIn(
         string target,
         CancellationToken cancellationToken
     )
@@ -99,6 +113,8 @@ internal static class UpdateAllNugetPackagesToLatestVersionProcessor
                 }
             }
         }
+
+        return xDocument;
     }
 
     private sealed class CustomLogger : NuGet.Common.ILogger
