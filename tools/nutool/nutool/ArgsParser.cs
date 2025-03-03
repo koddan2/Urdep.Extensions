@@ -9,7 +9,7 @@ internal class ArgsParser
         _args = args;
     }
 
-    internal string GetArgumentValue(string argName)
+    internal string? GetArgumentValue(string argName)
     {
         // find the key in the arguments
         for (var i = 0; i < _args.Length; i++)
@@ -21,7 +21,7 @@ internal class ArgsParser
             }
         }
 
-        throw new NutoolException($"Argument not found: {argName}");
+        return default;
     }
 
     internal SubCommand GetSubCommand()
@@ -30,13 +30,12 @@ internal class ArgsParser
         {
             return default;
         }
-        else if (Enum.TryParse<SubCommand>(_args[0], true, out var subCommand))
+
+        if (Enum.TryParse<SubCommand>(_args[0], ignoreCase: true, out var subCommand))
         {
             return subCommand;
         }
-        else
-        {
-            return default;
-        }
+
+        return default;
     }
 }

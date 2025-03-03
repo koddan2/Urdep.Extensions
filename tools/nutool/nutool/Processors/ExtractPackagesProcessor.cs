@@ -9,6 +9,19 @@ internal static class ExtractPackagesProcessor
     {
         var rootPath = Application.Args.GetArgumentValue("root");
         var outfile = Application.Args.GetArgumentValue("out");
+
+        if (string.IsNullOrWhiteSpace(rootPath) || string.IsNullOrWhiteSpace(outfile))
+        {
+            await PrintHelpAsync();
+            return 1;
+        }
+
+        if (!Directory.Exists(rootPath))
+        {
+            await Ui.Err.WriteLineAsync($"Directory '{rootPath}' does not exist.");
+            return 1;
+        }
+
         var csProjFiles = Utilities.GetAllPathsToCsProjFilesRecursively(rootPath);
         var packages = new HashSet<PackageVersion>();
         foreach (var csProjFile in csProjFiles)
@@ -26,7 +39,51 @@ internal static class ExtractPackagesProcessor
         }
 
         packages = [.. packages.OrderBy(p => p.Include, StringComparer.OrdinalIgnoreCase)];
+        packages = Consolidate(packages);
 
+        var xdoc = new XDocument();
+        var rootElement = new XElement("Project");
+        xdoc.Add(rootElement);
+
+        rootElement.Add(
+            new XElement("PropertyGroup", new XElement("ManagePackageVersionsCentrally", "true"))
+        );
+
+        AddPackageVersionElements(packages, rootElement);
+
+        await using var xmlWriter = XmlWriter.Create(
+            outfile,
+            new XmlWriterSettings
+            {
+                Indent = true,
+                Async = true,
+                OmitXmlDeclaration = true,
+            }
+        );
+        await xdoc.SaveAsync(xmlWriter, cancellationToken);
+
+        return 0;
+    }
+
+    private static void AddPackageVersionElements(
+        HashSet<PackageVersion> packages,
+        XElement rootElement
+    )
+    {
+        var itemGroupElement = new XElement("ItemGroup");
+        rootElement.Add(itemGroupElement);
+
+        foreach (var package in packages)
+        {
+            var element = new XElement("PackageVersion");
+            element.SetAttributeValue("Include", package.Include);
+            element.SetAttributeValue("Version", package.Version);
+            itemGroupElement.Add(element);
+        }
+    }
+
+    private static HashSet<PackageVersion> Consolidate(HashSet<PackageVersion> packages)
+    {
         // make sure that only the latest version of each package is included
         var latestPackages = new HashSet<PackageVersion>();
         foreach (var package in packages)
@@ -43,38 +100,13 @@ internal static class ExtractPackagesProcessor
             latestPackages.Add(package);
         }
 
-        packages = latestPackages;
+        return latestPackages;
+    }
 
-        var xdoc = new XDocument();
-        var rootElement = new XElement("Project");
-        xdoc.Add(rootElement);
-
-        rootElement.Add(
-            new XElement("PropertyGroup", new XElement("ManagePackageVersionsCentrally", "true"))
+    private static async Task PrintHelpAsync()
+    {
+        await Ui.Err.WriteLineAsync(
+            "Usage: nutool ExtractPackagesToCentralFile --root <root> --out <outfile>"
         );
-
-        var itemGroupElement = new XElement("ItemGroup");
-        rootElement.Add(itemGroupElement);
-
-        foreach (var package in packages)
-        {
-            var element = new XElement("PackageVersion");
-            element.SetAttributeValue("Include", package.Include);
-            element.SetAttributeValue("Version", package.Version);
-            itemGroupElement.Add(element);
-        }
-
-        await using var xmlWriter = XmlWriter.Create(
-            outfile,
-            new XmlWriterSettings
-            {
-                Indent = true,
-                Async = true,
-                OmitXmlDeclaration = true,
-            }
-        );
-        await xdoc.SaveAsync(xmlWriter, cancellationToken);
-
-        return 0;
     }
 }

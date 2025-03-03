@@ -25,7 +25,7 @@ public class TestCase1
         Assert.That(result, Is.EqualTo(0));
 
         var output = await File.ReadAllTextAsync(outputFile);
-        var expected = """
+        const string expected = """
             <Project>
               <PropertyGroup>
                 <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
@@ -39,5 +39,62 @@ public class TestCase1
             </Project>
             """;
         Assert.That(output, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public async Task Test_with_invalid_arguments()
+    {
+        var args = new string[] { "ExtractPackagesToCentralFile", "--invalidArg" };
+        var result = await Application.RunAsync(args, CancellationToken.None);
+        Assert.That(result, Is.Not.EqualTo(0));
+    }
+
+    [Test]
+    public async Task Test_with_missing_output_directory()
+    {
+        var args = new string[]
+        {
+            "ExtractPackagesToCentralFile",
+            "--root",
+            CommonTestData.PathTestAssets,
+            "--out",
+            "", // Missing output directory
+        };
+        var result = await Application.RunAsync(args, CancellationToken.None);
+        Assert.That(result, Is.Not.EqualTo(0));
+    }
+
+    [Test]
+    public async Task Test_with_empty_root_directory()
+    {
+        var outputDir = CommonTestData.GetScopedOutputDirectoryPath(nameof(TestCase1));
+        var outputFile = Path.Combine(outputDir, "result.xml");
+        var args = new string[]
+        {
+            "ExtractPackagesToCentralFile",
+            "--root",
+            "", // Empty root directory
+            "--out",
+            outputFile,
+        };
+        var result = await Application.RunAsync(args, CancellationToken.None);
+        Assert.That(result, Is.Not.EqualTo(0));
+    }
+
+    [Test]
+    public async Task Test_with_non_existent_root_directory()
+    {
+        var outputDir = CommonTestData.GetScopedOutputDirectoryPath(nameof(TestCase1));
+        var outputFile = Path.Combine(outputDir, "result.xml");
+        var args = new string[]
+        {
+            "ExtractPackagesToCentralFile",
+            "--root",
+            "non_existent_directory",
+            "--out",
+            outputFile,
+        };
+        var result = await Application.RunAsync(args, CancellationToken.None);
+        Assert.That(result, Is.Not.EqualTo(0));
     }
 }

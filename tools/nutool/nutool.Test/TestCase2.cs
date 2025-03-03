@@ -41,7 +41,7 @@ public class TestCase2
         }
     }
 
-    private void CheckTargetFramework(string targetFramework, string pathToCsProj)
+    private static void CheckTargetFramework(string targetFramework, string pathToCsProj)
     {
         var xdoc = XDocument.Load(pathToCsProj);
 
