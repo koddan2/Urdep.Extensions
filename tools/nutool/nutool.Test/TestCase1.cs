@@ -1,66 +1,30 @@
 ﻿namespace nutool.Test;
 
-public class Tests
+public class TestCase1
 {
-    private const string _PathTestOutput = "test-output.xml";
-    private const string _PathTestAssets = "TestAssets";
-
-    private static string _TempPath = Path.GetTempPath();
-    private static string _TempDir = Path.Combine(_TempPath, "nutool.Test", "TestCase1");
-
-    private static string PathTestOutput => GetPath(_PathTestOutput);
-    private static string PathTestAssets => GetPath(_PathTestAssets);
-
-    private static string GetPath(string path) => Path.Combine(_TempDir, path);
-
-    private static void CopyFilesRecursively(string sourcePath, string targetPath)
-    {
-        //Now Create all of the directories
-        foreach (
-            string dirPath in Directory.GetDirectories(sourcePath, "*", SearchOption.AllDirectories)
-        )
-        {
-            Directory.CreateDirectory(dirPath.Replace(sourcePath, targetPath));
-        }
-
-        //Copy all the files & Replaces any files with the same name
-        foreach (
-            string newPath in Directory.GetFiles(sourcePath, "*.*", SearchOption.AllDirectories)
-        )
-        {
-            File.Copy(newPath, newPath.Replace(sourcePath, targetPath), true);
-        }
-    }
-
     [SetUp]
     public void Setup()
     {
-        if (Directory.Exists(_TempDir))
-        {
-            Directory.Delete(_TempDir, true);
-        }
-        Directory.CreateDirectory(_TempDir);
-        CopyFilesRecursively("TestAssets", PathTestAssets);
-
-        Ui.Out = new StringWriter();
-        Ui.Err = new StringWriter();
+        CommonTestData.Init();
     }
 
     [Test]
-    public async Task Test1()
+    public async Task Test_that_normal_invocation_works_as_expected()
     {
+        var outputDir = CommonTestData.GetScopedOutputDirectoryPath(nameof(TestCase1));
+        var outputFile = Path.Combine(outputDir, "result.xml");
         var args = new string[]
         {
             "ExtractPackagesToCentralFile",
             "--root",
-            PathTestAssets,
+            CommonTestData.PathTestAssets,
             "--out",
-            PathTestOutput,
+            outputFile,
         };
         var result = await Application.RunAsync(args, CancellationToken.None);
         Assert.That(result, Is.EqualTo(0));
 
-        var output = await File.ReadAllTextAsync(PathTestOutput);
+        var output = await File.ReadAllTextAsync(outputFile);
         var expected = """
             <Project>
               <PropertyGroup>

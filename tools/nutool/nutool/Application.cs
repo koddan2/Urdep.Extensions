@@ -16,6 +16,8 @@ internal static class Application
         {
             case SubCommand.ExtractPackagesToCentralFile:
                 return await ExtractPackagesProcessor.RunAsync(cancellationToken);
+            case SubCommand.ChangeTargetFramework:
+                return await ChangeTargetFrameworkProcessor.RunAsync(cancellationToken);
             default:
                 await PrintHelpAsync();
                 return 1;
