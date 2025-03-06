@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-
 using static Bullseye.Targets;
 using static SimpleExec.Command;
 
@@ -19,14 +18,15 @@ namespace targets
         internal static class Dirs
         {
             public static string GetSourceFilePathName(
-                [CallerFilePath] string? callerFilePath = null)
-                => callerFilePath
-                ?? throw new InvalidOperationException(nameof(callerFilePath));
+                [CallerFilePath] string? callerFilePath = null
+            ) => callerFilePath ?? throw new InvalidOperationException(nameof(callerFilePath));
 
-            public static string Containing => Path.GetDirectoryName(GetSourceFilePathName())
+            public static string Containing =>
+                Path.GetDirectoryName(GetSourceFilePathName())
                 ?? throw new InvalidOperationException("Unable to get directory");
 
-            public static string Parent => Path.GetDirectoryName(Containing)
+            public static string Parent =>
+                Path.GetDirectoryName(Containing)
                 ?? throw new InvalidOperationException("Unable to get directory");
 
             public static string Src => Path.Combine(Parent, "src");
@@ -51,15 +51,22 @@ namespace targets
 
         private static class CsProj
         {
-            private static string PathToLibCsProj(string name) => Path.Combine(Dirs.Src, name, $"{name}.csproj");
-            public static string UrdepExtensionsAugmentation = PathToLibCsProj("Urdep.Extensions.Augmentation");
+            private static string PathToLibCsProj(string name) =>
+                Path.Combine(Dirs.Src, name, $"{name}.csproj");
+
+            public static string UrdepExtensionsAugmentation = PathToLibCsProj(
+                "Urdep.Extensions.Augmentation"
+            );
             public static string UrdepExtensionsData = PathToLibCsProj("Urdep.Extensions.Data");
-            public static string UrdepExtensionsFileSystem = PathToLibCsProj("Urdep.Extensions.FileSystem");
+            public static string UrdepExtensionsFileSystem = PathToLibCsProj(
+                "Urdep.Extensions.FileSystem"
+            );
             public static string UrdepExtensionsText = PathToLibCsProj("Urdep.Extensions.Text");
 
             public static string Tests = PathToLibCsProj("Tests");
 
-            private static string PathToAppCsProj(string name) => Path.Combine(Dirs.Src, "Applications", name, $"{name}.csproj");
+            private static string PathToAppCsProj(string name) =>
+                Path.Combine(Dirs.Src, "Applications", name, $"{name}.csproj");
 
             public static string TrackingCopyTool = PathToAppCsProj("TrackingCopyTool");
             public static string Align = PathToAppCsProj("Align");
@@ -82,8 +89,14 @@ namespace targets
 
             public static IEnumerable<string> All()
             {
-                foreach (string lib in AllLibraries()) { yield return lib; }
-                foreach (string app in AllApplications()) { yield return app; }
+                foreach (string lib in AllLibraries())
+                {
+                    yield return lib;
+                }
+                foreach (string app in AllApplications())
+                {
+                    yield return app;
+                }
             }
         }
 
@@ -91,88 +104,140 @@ namespace targets
         {
             Target(TargetNames.RestoreTools, () => Run("dotnet", "tool restore"));
 
-            Target(TargetNames.FormatSource, DependsOn(TargetNames.RestoreTools), async () =>
-            {
-                var tasks = CsProj.All().Select(csproj =>
-                    RunAsync("dotnet", $"tool run dotnet-csharpier {Path.GetDirectoryName(csproj) ?? throw new InvalidOperationException()}")
-                );
-                await Task.WhenAll(tasks);
-            });
-
-            Target(TargetNames.CleanBuildOutput, async () =>
-            {
-                var tasks = CsProj.All().Select(csproj =>
-                    RunAsync("dotnet", $"clean {csproj} -c Release -v m --nologo")
-                );
-                await Task.WhenAll(tasks);
-            });
-
-            Target(TargetNames.Build, DependsOn(TargetNames.CleanBuildOutput), async () =>
-            {
+            Target(
+                TargetNames.FormatSource,
+                DependsOn(TargetNames.RestoreTools),
+                async () =>
                 {
-                    var tasks = CsProj.AllLibraries().Select(csproj =>
-                        RunAsync("dotnet", $"build {csproj} -c Release --nologo")
-                    );
+                    var tasks = CsProj
+                        .All()
+                        .Select(csproj =>
+                            RunAsync(
+                                "dotnet",
+                                $"tool run dotnet-csharpier {Path.GetDirectoryName(csproj) ?? throw new InvalidOperationException()}"
+                            )
+                        );
                     await Task.WhenAll(tasks);
                 }
+            );
 
-                await RunAsync("dotnet", $"build {CsProj.Tests} -c Release --nologo");
-
+            Target(
+                TargetNames.CleanBuildOutput,
+                async () =>
                 {
-                    var tasks = CsProj.AllApplications().Select(csproj =>
-                        RunAsync("dotnet", $"build {csproj} -c Release --nologo")
-                    );
+                    var tasks = CsProj
+                        .All()
+                        .Select(csproj =>
+                            RunAsync("dotnet", $"clean {csproj} -c Release -v m --nologo")
+                        );
                     await Task.WhenAll(tasks);
                 }
-            });
+            );
 
-            Target(TargetNames.BuildDebug, DependsOn(TargetNames.CleanBuildOutput), async () =>
-            {
+            Target(
+                TargetNames.Build,
+                DependsOn(TargetNames.CleanBuildOutput),
+                async () =>
                 {
-                    var tasks = CsProj.AllLibraries().Select(csproj =>
-                        RunAsync("dotnet", $"build {csproj} -c Debug --nologo")
-                    );
-                    await Task.WhenAll(tasks);
+                    {
+                        var tasks = CsProj
+                            .AllLibraries()
+                            .Select(csproj =>
+                                RunAsync("dotnet", $"build {csproj} -c Release --nologo")
+                            );
+                        await Task.WhenAll(tasks);
+                    }
+
+                    await RunAsync("dotnet", $"build {CsProj.Tests} -c Release --nologo");
+
+                    {
+                        var tasks = CsProj
+                            .AllApplications()
+                            .Select(csproj =>
+                                RunAsync("dotnet", $"build {csproj} -c Release --nologo")
+                            );
+                        await Task.WhenAll(tasks);
+                    }
                 }
+            );
 
-                await RunAsync("dotnet", $"build {CsProj.Tests} -c Debug --nologo");
-
+            Target(
+                TargetNames.BuildDebug,
+                DependsOn(TargetNames.CleanBuildOutput),
+                async () =>
                 {
-                    var tasks = CsProj.AllApplications().Select(csproj =>
-                        RunAsync("dotnet", $"build {csproj} -c Debug --nologo")
-                    );
-                    await Task.WhenAll(tasks);
+                    {
+                        var tasks = CsProj
+                            .AllLibraries()
+                            .Select(csproj =>
+                                RunAsync("dotnet", $"build {csproj} -c Debug --nologo")
+                            );
+                        await Task.WhenAll(tasks);
+                    }
+
+                    await RunAsync("dotnet", $"build {CsProj.Tests} -c Debug --nologo");
+
+                    {
+                        var tasks = CsProj
+                            .AllApplications()
+                            .Select(csproj =>
+                                RunAsync("dotnet", $"build {csproj} -c Debug --nologo")
+                            );
+                        await Task.WhenAll(tasks);
+                    }
                 }
-            });
+            );
 
-            Target(TargetNames.Test, DependsOn(TargetNames.Build), async () => await RunAsync("dotnet", $"test {CsProj.Tests} -c Release --no-build --nologo"));
+            Target(
+                TargetNames.Test,
+                DependsOn(TargetNames.Build),
+                async () =>
+                    await RunAsync("dotnet", $"test {CsProj.Tests} -c Release --no-build --nologo")
+            );
 
-            Target(TargetNames.CleanPackOutput, () =>
-            {
-                if (Directory.Exists(Dirs.PackOutput))
+            Target(
+                TargetNames.CleanPackOutput,
+                () =>
                 {
-                    Directory.Delete(Dirs.PackOutput, true);
+                    if (Directory.Exists(Dirs.PackOutput))
+                    {
+                        Directory.Delete(Dirs.PackOutput, true);
+                    }
                 }
-            });
+            );
 
-            Target(TargetNames.Pack, DependsOn(TargetNames.Build, TargetNames.CleanPackOutput), async () =>
-            {
-                Directory.CreateDirectory(Dirs.PackOutput);
-
+            Target(
+                TargetNames.Pack,
+                DependsOn(TargetNames.Build, TargetNames.CleanPackOutput),
+                async () =>
                 {
-                    var tasks = CsProj.AllLibraries().Select(csproj =>
-                        RunAsync("dotnet", $"pack {csproj} -c Release -o {Dirs.PackOutput} --no-build --nologo --include-symbols --include-source")
-                    );
-                    await Task.WhenAll(tasks);
-                }
+                    Directory.CreateDirectory(Dirs.PackOutput);
 
-                {
-                    var tasks = CsProj.AllApplications().Select(csproj =>
-                        RunAsync("dotnet", $"publish {csproj} -c Release -o {Path.Combine(Dirs.PackOutput, Path.GetFileNameWithoutExtension(csproj))} --no-build --nologo")
-                    );
-                    await Task.WhenAll(tasks);
+                    {
+                        var tasks = CsProj
+                            .AllLibraries()
+                            .Select(csproj =>
+                                RunAsync(
+                                    "dotnet",
+                                    $"pack {csproj} -c Release -o {Dirs.PackOutput} --no-build --nologo --include-symbols --include-source"
+                                )
+                            );
+                        await Task.WhenAll(tasks);
+                    }
+
+                    {
+                        var tasks = CsProj
+                            .AllApplications()
+                            .Select(csproj =>
+                                RunAsync(
+                                    "dotnet",
+                                    $"publish {csproj} -c Release -o {Path.Combine(Dirs.PackOutput, Path.GetFileNameWithoutExtension(csproj))} --no-build --nologo"
+                                )
+                            );
+                        await Task.WhenAll(tasks);
+                    }
                 }
-            });
+            );
 
             ////Target(Targets.SignPackage, DependsOn(Targets.Pack, Targets.RestoreTools), () =>
             ////{
@@ -183,7 +248,10 @@ namespace targets
 
             ////Target("sign", DependsOn(Targets.Test, Targets.SignPackage));
 
-            await RunTargetsAndExitAsync(args, ex => ex is SimpleExec.ExitCodeException || ex.Message.EndsWith(_EnvVarMissing));
+            await RunTargetsAndExitAsync(
+                args,
+                ex => ex is SimpleExec.ExitCodeException || ex.Message.EndsWith(_EnvVarMissing)
+            );
         }
 
         ////private static void SignNuGet()

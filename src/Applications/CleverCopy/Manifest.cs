@@ -8,7 +8,12 @@ internal class Manifest
     internal static readonly string ManifestFileName = "manifest.yaml";
 
     public Manifest() { }
-    public Manifest(string baseDir, IEnumerable<string> absolutePathsToFiles, bool loadExistingManifestOnly = false)
+
+    public Manifest(
+        string baseDir,
+        IEnumerable<string> absolutePathsToFiles,
+        bool loadExistingManifestOnly = false
+    )
     {
         Timestamp = DateTimeOffset.Now;
         IsLittleEndian = BitConverter.IsLittleEndian;
@@ -51,7 +56,8 @@ internal class Manifest
     {
         var file = Path.Combine(containingDir, ManifestFileName);
         Program.Io.Info("Reading manifest file: {0}", file);
-        var result = YamlHelper.DeserializeFromFile<Manifest>(file)
+        var result =
+            YamlHelper.DeserializeFromFile<Manifest>(file)
             ?? throw Exns.GeneralError(4, "Unable to read manifest file at {0}", file);
         Program.Io.Verbose("Manifest read from file: {0}", file);
         return result;

@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.FileSystemGlobbing;
-using System.Data.HashFunction.xxHash;
+﻿using System.Data.HashFunction.xxHash;
 using System.Diagnostics;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileSystemGlobbing;
 using TrackingCopyTool.Config;
 using TrackingCopyTool.Utility;
 

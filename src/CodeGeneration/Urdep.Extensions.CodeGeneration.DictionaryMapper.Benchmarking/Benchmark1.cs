@@ -1,6 +1,5 @@
-﻿using BenchmarkDotNet.Attributes;
-using System.Text.Json;
-
+﻿using System.Text.Json;
+using BenchmarkDotNet.Attributes;
 using Urdep.Extensions.CodeGeneration.DictionaryMapper.Benchmarking.DictionaryMapping;
 
 namespace Urdep.Extensions.CodeGeneration.DictionaryMapper.Benchmarking

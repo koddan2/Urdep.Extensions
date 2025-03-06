@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.FileSystemGlobbing;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Microsoft.Extensions.FileSystemGlobbing;
 using TrackingCopyTool.Utility;
 
 namespace CleverCopy;
@@ -28,7 +28,10 @@ internal class Processor
         Program.Io.Verbose("Checking whether directory {0} exists", Program.Cfg.SourceDirectory);
         if (!Directory.Exists(Program.Cfg.SourceDirectory))
         {
-            throw Exns.GeneralError(3, $"The directory {Program.Cfg.SourceDirectory} ({nameof(Program.Cfg.SourceDirectory)}) does not exist.");
+            throw Exns.GeneralError(
+                3,
+                $"The directory {Program.Cfg.SourceDirectory} ({nameof(Program.Cfg.SourceDirectory)}) does not exist."
+            );
         }
 
         Matcher matcher = new(StringComparison.OrdinalIgnoreCase);
@@ -39,7 +42,11 @@ internal class Processor
         _targetFilesAbsolutePaths = matcher.GetResultsInFullPath(Program.Cfg.TargetDirectory);
 
         _manifestSource = new(Program.Cfg.SourceDirectory, _sourceFilesAbsolutePaths);
-        _manifestTarget = new(Program.Cfg.TargetDirectory, _targetFilesAbsolutePaths, loadExistingManifestOnly: true);
+        _manifestTarget = new(
+            Program.Cfg.TargetDirectory,
+            _targetFilesAbsolutePaths,
+            loadExistingManifestOnly: true
+        );
     }
 
     public void Execute()
@@ -51,8 +58,16 @@ internal class Processor
 
     private void Step2Report()
     {
-        Program.Io.ErrLine("Copied a total of:        {0:f2} kB ({1} files)", _totalBytesCopied / 1000d, _totalFilesCopied);
-        Program.Io.ErrLine("Did not copy a total of:  {0:f2} kB ({1} files)", _totalBytesNotCopied / 1000d, _totalFilesNotCopied);
+        Program.Io.ErrLine(
+            "Copied a total of:        {0:f2} kB ({1} files)",
+            _totalBytesCopied / 1000d,
+            _totalFilesCopied
+        );
+        Program.Io.ErrLine(
+            "Did not copy a total of:  {0:f2} kB ({1} files)",
+            _totalBytesNotCopied / 1000d,
+            _totalFilesNotCopied
+        );
         Program.Io.ErrLine("Duration:                 {0}", _stopwatch.Elapsed);
         Program.Io.ErrLine("Started at:               {0}", _startTime.ToString());
         Program.Io.ErrLine("Ended at:                 {0}", DateTimeOffset.Now.ToString());
@@ -104,8 +119,13 @@ internal class Processor
     {
         var srcFullPath = Path.Combine(Program.Cfg.SourceDirectory, fileRelPath);
         var tgtFullPath = Path.Combine(Program.Cfg.TargetDirectory, fileRelPath);
-        var tgtContainingDir = Path.GetDirectoryName(tgtFullPath)
-            ?? throw Exns.GeneralError(6, "Could not determine directory at target ({0})", tgtFullPath);
+        var tgtContainingDir =
+            Path.GetDirectoryName(tgtFullPath)
+            ?? throw Exns.GeneralError(
+                6,
+                "Could not determine directory at target ({0})",
+                tgtFullPath
+            );
         Directory.CreateDirectory(tgtContainingDir);
 
 #pragma warning disable RCS1163 // Unused parameter.

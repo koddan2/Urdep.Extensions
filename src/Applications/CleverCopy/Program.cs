@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using Microsoft.Extensions.Configuration;
 using TrackingCopyTool.Utility;
 
 namespace CleverCopy;
@@ -28,8 +28,7 @@ public static class Program
         try
         {
             Io = new ApplicationIo();
-            var needHelp = args.Length == 0
-                || HasAnyArg(args[0], _HelpArgs);
+            var needHelp = args.Length == 0 || HasAnyArg(args[0], _HelpArgs);
             if (needHelp)
             {
                 PrintHelp();
@@ -43,7 +42,8 @@ public static class Program
                 .AddCommandLine(args)
                 .Build();
 
-            Cfg = cfgRoot.Get<ProgramCfg>()
+            Cfg =
+                cfgRoot.Get<ProgramCfg>()
                 ?? throw Exns.GeneralError(2, "Unable to parse configuration");
 
             var processor = new Processor();
@@ -83,28 +83,32 @@ public static class Program
         var ownDir = GetDirectoryContainingThisProgram();
         var asm = GetThisProgramsAssembly();
         var attrs = asm.GetCustomAttributes();
-        var assemblyProductAttr = (AssemblyProductAttribute)attrs.First(x => x.GetType().FullName == "System.Reflection.AssemblyProductAttribute");
+        var assemblyProductAttr = (AssemblyProductAttribute)
+            attrs.First(x => x.GetType().FullName == "System.Reflection.AssemblyProductAttribute");
         var docFileName = $"{assemblyProductAttr.Product}.xml";
         var docFilePath = Path.Combine(ownDir, docFileName);
         Io.ErrLine("{0}", assemblyProductAttr.Product);
         var xdoc = XDocument.Load(docFilePath);
         Io.ErrLine(xdoc.ToString());
 
-        Io.ErrLine(@"Examples:
+        Io.ErrLine(
+            @"Examples:
 CleverCopy.exe --verbosity=Information \
     --sourceDirectory=c:/some/dir/with/files \
     --targetDirectory=\\remote\d$\targetdir \
     --includeGlobs:0=*.txt
     --includeGlobs:1=*.md
     --excludeGlobs:0=unimportant.txt
-");
+"
+        );
     }
 
     private static string GetDirectoryContainingThisProgram()
     {
         var pathToThisAssembly = GetThisProgramsAssembly().Location;
         var directoryPath = Path.GetDirectoryName(pathToThisAssembly);
-        return directoryPath ?? throw Exns.GeneralError(1, "Cannot determine file system path to executable.");
+        return directoryPath
+            ?? throw Exns.GeneralError(1, "Cannot determine file system path to executable.");
     }
 
     private static Assembly GetThisProgramsAssembly()

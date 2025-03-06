@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace TrackingCopyTool.Config;
 

@@ -1,7 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Text;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using System.Text;
 
 namespace Urdep.Extensions.CodeGeneration.DictionaryMapper;
 
@@ -76,8 +76,8 @@ public class DictionaryMappingGenerator : ISourceGenerator
         {
             AppendHeader(codeBuilder);
             // Use the semantic model to get the symbol for this type
-            var typeNodeSymbol = context.Compilation
-                .GetSemanticModel(typeDeclSyn.SyntaxTree)
+            var typeNodeSymbol = context
+                .Compilation.GetSemanticModel(typeDeclSyn.SyntaxTree)
                 .GetDeclaredSymbol(typeDeclSyn);
             if (typeNodeSymbol is null)
             {

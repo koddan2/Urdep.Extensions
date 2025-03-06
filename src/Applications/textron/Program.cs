@@ -6,10 +6,7 @@ public static class Program
 {
     public static async Task<int> Main(string[] args)
     {
-        string[] helpArgs =
-        [
-            "help", "?", "-h", "--help"
-        ];
+        string[] helpArgs = ["help", "?", "-h", "--help"];
         if (args.Length != 1)
         {
             PrintHelp();
@@ -38,10 +35,12 @@ public static class Program
     private static void PrintHelp()
     {
         var assembly = typeof(Program).Assembly;
-        var fileVersionInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(
-            assembly.Location
+        var fileVersionInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+        Console.WriteLine(
+            "{0} - version {1}",
+            assembly.GetName().Name,
+            fileVersionInfo.ProductVersion
         );
-        Console.WriteLine("{0} - version {1}", assembly.GetName().Name, fileVersionInfo.ProductVersion);
         Console.WriteLine(
             "Supply exactly one argument to this program, which is a path to a pipeline XML file."
         );

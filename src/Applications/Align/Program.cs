@@ -1,6 +1,6 @@
-﻿using CsvHelper.Configuration;
+﻿using System.Diagnostics;
+using CsvHelper.Configuration;
 using Microsoft.Extensions.FileSystemGlobbing;
-using System.Diagnostics;
 using Urdep.Extensions.Text;
 
 namespace Align;

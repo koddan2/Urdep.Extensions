@@ -267,8 +267,8 @@ internal class ProgramCfg
     /// The full path to the restart manifest file relative to the target directory.
     /// </summary>
     public string RestartManifestFileFullPathTarget =>
-        new FileInfo(ManifestFileFullPathTarget).GetTransformedFileNameKeepParentPath(
-            n => $"{n}-restart"
+        new FileInfo(ManifestFileFullPathTarget).GetTransformedFileNameKeepParentPath(n =>
+            $"{n}-restart"
         );
 
     /// <summary>

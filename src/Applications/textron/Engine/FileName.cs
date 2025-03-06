@@ -8,6 +8,7 @@ public interface ITransformerPipeline
 {
     Task ProcessAsync();
 }
+
 public static class ValidationExtensions
 {
     [return: NotNull]
@@ -15,12 +16,15 @@ public static class ValidationExtensions
     {
         if (reference is null)
         {
-            throw new ArgumentNullException(nameof(reference) + message is null ? "" : $" {message}");
+            throw new ArgumentNullException(
+                nameof(reference) + message is null ? "" : $" {message}"
+            );
         }
 
         return reference;
     }
 }
+
 public class XmlBasedTransformerPipeline : ITransformerPipeline
 {
     private readonly Lazy<Task<XDocument>> _document;
@@ -29,7 +33,14 @@ public class XmlBasedTransformerPipeline : ITransformerPipeline
     public XmlBasedTransformerPipeline(string pathToXmlFile)
     {
         _pathToXmlFile = pathToXmlFile;
-        _document = new Lazy<Task<XDocument>>(async () => await XDocument.LoadAsync(File.OpenRead(pathToXmlFile), default, CancellationToken.None));
+        _document = new Lazy<Task<XDocument>>(
+            async () =>
+                await XDocument.LoadAsync(
+                    File.OpenRead(pathToXmlFile),
+                    default,
+                    CancellationToken.None
+                )
+        );
     }
 
     async Task ITransformerPipeline.ProcessAsync()
@@ -38,8 +49,10 @@ public class XmlBasedTransformerPipeline : ITransformerPipeline
 
         var workingDir = Path.GetDirectoryName(_pathToXmlFile).Require();
         var inputEl = doc.XPathSelectElement("pipeline/input").Require();
-        var input = new PipelineInputFactory(workingDir)
-            .CreateFrom(inputEl.Attribute("type").Require().Value, inputEl.Attribute("name").Require().Value);
+        var input = new PipelineInputFactory(workingDir).CreateFrom(
+            inputEl.Attribute("type").Require().Value,
+            inputEl.Attribute("name").Require().Value
+        );
 
         Console.WriteLine(input);
         Stream result = input.Resolve();
@@ -56,7 +69,9 @@ public class XmlBasedTransformerPipeline : ITransformerPipeline
         }
 
         var outputEl = doc.XPathSelectElement("pipeline/output").Require();
-        IPipelineOutput output = new FileSystemPipelineOutput(Path.Combine(workingDir, outputEl.Attribute("name").Require().Value));
+        IPipelineOutput output = new FileSystemPipelineOutput(
+            Path.Combine(workingDir, outputEl.Attribute("name").Require().Value)
+        );
         {
             result.Seek(0, SeekOrigin.Begin);
         }
@@ -104,6 +119,7 @@ public interface IPipelineOutput
 {
     Task WriteAsync(Stream data);
 }
+
 public record FileSystemPipelineOutput : IPipelineOutput
 {
     public FileSystemPipelineOutput(string absolutePath)

@@ -24,12 +24,11 @@ internal class ModelCollector : CSharpSyntaxWalker
                     ["Identifier"] = classnode.Identifier.ValueText,
                     ["BaseList"] = classnode.BaseList?.ToString() ?? "",
                     ["Modifiers"] = classnode.Modifiers.ToString(),
-                    ["Attributes"] = classnode.AttributeLists
-                        .SelectMany(
-                            x =>
-                                x.Attributes.Select(
-                                    a => new[] { a.Name.ToString(), a.ArgumentList?.ToString() }
-                                )
+                    ["Attributes"] = classnode
+                        .AttributeLists.SelectMany(x =>
+                            x.Attributes.Select(a =>
+                                new[] { a.Name.ToString(), a.ArgumentList?.ToString() }
+                            )
                         )
                         .ToList()
                 };
@@ -44,12 +43,11 @@ internal class ModelCollector : CSharpSyntaxWalker
                     ? gen.Identifier.ValueText
                     : "",
                 ["Modifiers"] = node.Modifiers.ToString(),
-                ["Attributes"] = node.AttributeLists
-                    .SelectMany(
-                        x =>
-                            x.Attributes.Select(
-                                a => new[] { a.Name.ToString(), a.ArgumentList?.ToString() }
-                            )
+                ["Attributes"] = node
+                    .AttributeLists.SelectMany(x =>
+                        x.Attributes.Select(a =>
+                            new[] { a.Name.ToString(), a.ArgumentList?.ToString() }
+                        )
                     )
                     .ToList()
             };

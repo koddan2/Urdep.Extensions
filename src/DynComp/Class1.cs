@@ -1,13 +1,13 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Text;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarlJ.DynamicLambda
 {
@@ -67,8 +67,7 @@ namespace CarlJ.DynamicLambda
             {
                 throw new InvalidOperationException(
                     "Error in expression: "
-                        + cr.Diagnostics
-                            .First(e => e.Severity == DiagnosticSeverity.Error)
+                        + cr.Diagnostics.First(e => e.Severity == DiagnosticSeverity.Error)
                             .GetMessage()
                 );
             }

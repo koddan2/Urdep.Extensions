@@ -1,7 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Text;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using System.Text;
 
 namespace MapperCodeGen;
 
@@ -26,8 +26,8 @@ public class DtoGenerator : ISourceGenerator
         foreach (var typeNode in targetTypeTracker.TypesNeedingDtoGening)
         {
             // Use the semantic model to get the symbol for this type
-            var typeNodeSymbol = context.Compilation
-                .GetSemanticModel(typeNode.SyntaxTree)
+            var typeNodeSymbol = context
+                .Compilation.GetSemanticModel(typeNode.SyntaxTree)
                 .GetDeclaredSymbol(typeNode);
             if (typeNodeSymbol is null)
             {

@@ -5,13 +5,11 @@ namespace CleverCopy;
 
 internal static class YamlHelper
 {
-    public static ISerializer GetSerializer() => new SerializerBuilder()
-            .WithTypeConverter(new DateTimeOffsetConverter())
-            .Build();
+    public static ISerializer GetSerializer() =>
+        new SerializerBuilder().WithTypeConverter(new DateTimeOffsetConverter()).Build();
 
-    public static IDeserializer GetDeserializer() => new DeserializerBuilder()
-            .WithTypeConverter(new DateTimeOffsetConverter())
-            .Build();
+    public static IDeserializer GetDeserializer() =>
+        new DeserializerBuilder().WithTypeConverter(new DateTimeOffsetConverter()).Build();
 
     public static void SerializeToWriter<T>(TextWriter writer, T obj)
     {

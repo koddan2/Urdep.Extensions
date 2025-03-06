@@ -23,9 +23,9 @@ internal static class ProgramCfgExtensions
         return [.. cfg.ExcludeGlobs, .. defaultExcludeGlobs];
     }
 
-    public static string GetSourceDirectoryCleverCopyDirectory(this ProgramCfg cfg)
-        => Path.Combine(cfg.SourceDirectory, cfg.CleverCopyDirectoryName);
+    public static string GetSourceDirectoryCleverCopyDirectory(this ProgramCfg cfg) =>
+        Path.Combine(cfg.SourceDirectory, cfg.CleverCopyDirectoryName);
 
-    public static string GetTargetDirectoryCleverCopyDirectory(this ProgramCfg cfg)
-        => Path.Combine(cfg.TargetDirectory, cfg.CleverCopyDirectoryName);
+    public static string GetTargetDirectoryCleverCopyDirectory(this ProgramCfg cfg) =>
+        Path.Combine(cfg.TargetDirectory, cfg.CleverCopyDirectoryName);
 }
