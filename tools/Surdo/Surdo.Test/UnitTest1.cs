@@ -1,6 +1,6 @@
 ﻿namespace Surdo.Test
 {
-    public class Tests
+    public class UnitTest1
     {
         [SetUp]
         public void Setup() { }
