@@ -1,0 +1,19 @@
+<Project>
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>embedded</DebugType>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Version>0.0.1-dev</Version>
+    <Authors>Authors</Authors>
+
+    <!-- release environment constants -->
+    <DefineConstants Condition="'$(QQ_ENVIRONMENT)' == 'next'">$(DefineConstants);ENV_NEXT</DefineConstants>
+    <DefineConstants Condition="'$(QQ_ENVIRONMENT)' == 'stable'">$(DefineConstants);ENV_STABLE</DefineConstants>
+    <DefineConstants Condition="'$(QQ_ENVIRONMENT)' == ''">$(DefineConstants);ENV_LOCAL</DefineConstants>
+  </PropertyGroup>
+
+</Project>
