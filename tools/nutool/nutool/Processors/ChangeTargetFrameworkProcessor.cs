@@ -24,7 +24,12 @@ internal static class ChangeTargetFrameworkProcessor
             var targetFrameworkElement = xDocument.Descendants("TargetFramework").FirstOrDefault();
             if (targetFrameworkElement == null)
             {
-                var propertyGroupElement = xDocument.Descendants("PropertyGroup").First();
+                var propertyGroupElement = xDocument.Descendants("PropertyGroup").FirstOrDefault();
+                if (propertyGroupElement is null)
+                {
+                    await Ui.Err.WriteLineAsync($"No PropertyGroup element found in {csProjFile}");
+                    continue;
+                }
                 propertyGroupElement.Add(new XElement("TargetFramework", targetFramework));
             }
             else
@@ -42,6 +47,7 @@ internal static class ChangeTargetFrameworkProcessor
                 }
             );
             await xDocument.SaveAsync(xmlWriter, cancellationToken);
+            await Ui.Out.WriteLineAsync($"Updated {csProjFile}");
         }
 
         return 0;

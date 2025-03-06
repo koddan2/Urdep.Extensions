@@ -61,6 +61,7 @@ internal static class ExtractPackagesProcessor
             }
         );
         await xdoc.SaveAsync(xmlWriter, cancellationToken);
+        await Ui.Out.WriteLineAsync($"Extracted {packages.Count} packages to {outfile}");
 
         return 0;
     }

@@ -22,6 +22,8 @@ internal static class Application
                 return await UpdateAllNugetPackagesToLatestVersionProcessor.RunAsync(
                     cancellationToken
                 );
+            case SubCommand.SortPackageVersions:
+                return await SortPackageVersionsProcessor.RunAsync(cancellationToken);
             default:
                 await PrintHelpAsync();
                 return 1;
