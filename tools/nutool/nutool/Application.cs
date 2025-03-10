@@ -22,6 +22,8 @@ internal static class Application
                 return await UpdateAllNugetPackagesToLatestVersionProcessor.RunAsync(
                     cancellationToken
                 );
+            case SubCommand.RemovePackageReferenceVersions:
+                return await RemovePackageReferenceVersions.RunAsync(cancellationToken);
             case SubCommand.SortPackageVersions:
                 return await SortPackageVersionsProcessor.RunAsync(cancellationToken);
             default:
@@ -37,7 +39,15 @@ internal static class Application
         await Ui.Err.WriteLineAsync("subcommands:");
         foreach (var subCommand in subCommands)
         {
-            await Ui.Err.WriteLineAsync($"  {subCommand}");
+            bool isUnknown = !string.Equals(
+                subCommand,
+                nameof(SubCommand.Unknown),
+                StringComparison.OrdinalIgnoreCase
+            );
+            if (isUnknown)
+            {
+                await Ui.Err.WriteLineAsync($"  {subCommand}");
+            }
         }
     }
 }

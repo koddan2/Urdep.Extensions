@@ -64,7 +64,7 @@ internal static class SortPackageVersionsProcessor
         var xml = xdoc.ToString();
         xdoc = XDocument.Parse(xml);
 
-        await File.WriteAllTextAsync(targetfile, xdoc.ToString());
+        await File.WriteAllTextAsync(targetfile, xdoc.ToString(), cancellationToken);
     }
 
     private static async Task<XDocument> LoadXmlAsync(

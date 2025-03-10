@@ -1,6 +1,6 @@
 ﻿namespace nutool.Test;
 
-public class TestCase1
+public class Tests_for_ExtractPackagesToCentralFile
 {
     [SetUp]
     public void Setup()
@@ -11,7 +11,9 @@ public class TestCase1
     [Test]
     public async Task Test_that_normal_invocation_works_as_expected()
     {
-        var outputDir = CommonTestData.GetScopedOutputDirectoryPath(nameof(TestCase1));
+        var outputDir = CommonTestData.GetScopedOutputDirectoryPath(
+            nameof(Tests_for_ExtractPackagesToCentralFile)
+        );
         var outputFile = Path.Combine(outputDir, "result.xml");
         var args = new string[]
         {
@@ -67,7 +69,9 @@ public class TestCase1
     [Test]
     public async Task Test_with_empty_root_directory()
     {
-        var outputDir = CommonTestData.GetScopedOutputDirectoryPath(nameof(TestCase1));
+        var outputDir = CommonTestData.GetScopedOutputDirectoryPath(
+            nameof(Tests_for_ExtractPackagesToCentralFile)
+        );
         var outputFile = Path.Combine(outputDir, "result.xml");
         var args = new string[]
         {
@@ -84,7 +88,9 @@ public class TestCase1
     [Test]
     public async Task Test_with_non_existent_root_directory()
     {
-        var outputDir = CommonTestData.GetScopedOutputDirectoryPath(nameof(TestCase1));
+        var outputDir = CommonTestData.GetScopedOutputDirectoryPath(
+            nameof(Tests_for_ExtractPackagesToCentralFile)
+        );
         var outputFile = Path.Combine(outputDir, "result.xml");
         var args = new string[]
         {

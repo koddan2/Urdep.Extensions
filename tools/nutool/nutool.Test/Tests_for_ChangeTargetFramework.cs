@@ -2,7 +2,7 @@
 
 namespace nutool.Test;
 
-public class TestCase2
+public class Tests_for_ChangeTargetFramework
 {
     [SetUp]
     public void Setup()
@@ -33,7 +33,7 @@ public class TestCase2
                 targetFramework,
                 Path.Combine(
                     CommonTestData.PathTestAssets,
-                    nameof(TestCase2),
+                    nameof(Tests_for_ChangeTargetFramework),
                     csProj,
                     $"{csProj}.csproj"
                 )
