@@ -2,6 +2,8 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+namespace Surdo.Tool;
+
 public class PocoClassProcessor : CSharpSyntaxWalker
 {
     public override void VisitClassDeclaration(ClassDeclarationSyntax node)
@@ -15,6 +17,7 @@ public class PocoClassProcessor : CSharpSyntaxWalker
             // Generate a new class based on the POCO class
             var newClass = GenerateNewClass(node, properties);
             // Output or save the new class
+            _ = newClass;
         }
 
         base.VisitClassDeclaration(node);
